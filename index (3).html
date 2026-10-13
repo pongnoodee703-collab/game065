@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>N&amp;J restaurant · เกมทำอาหารแสนน่ารัก</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Mali:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   0. THEME TOKENS  (พาสเทลสดใส)
+   ===================================================================== */
+:root{
+  --pink:#ffb3d1; --pink-d:#ff86b3; --pink-l:#ffe3ef;
+  --mint:#b9f0dc; --mint-d:#5fd3ac;
+  --sky:#bfe3ff; --butter:#fff0b3; --butter-d:#ffcf5c;
+  --lav:#d8c9ff; --peach:#ffd2b3;
+  --ink:#6a4566; --ink-2:#9a7396; --white:#fff;
+  --font:'Mali','Fredoka','Sarabun','Tahoma',sans-serif;
+  --font-d:'Fredoka','Mali','Tahoma',sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;position:relative;overflow:hidden;background:#ffe9f3;color:var(--ink);font-family:var(--font);font-weight:500;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font-family:inherit}
+:focus-visible{outline:4px solid #7a5cff;outline-offset:3px;border-radius:12px}
+
+/* =====================================================================
+   1. SHARED  (ปุ่ม / หน้าจอ / ดาว / ลาก)
+   ===================================================================== */
+.screen{position:absolute;inset:0;display:none;overflow:hidden}
+.screen.active{display:flex;flex-direction:column}
+.btn{font:inherit;font-weight:700;font-size:1.05rem;border:0;border-radius:99px;padding:.7em 1.5em;background:#fff;color:var(--ink);box-shadow:0 5px 0 #f0b7cf;cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #f0b7cf}
+.btn.pri{background:linear-gradient(#ff9fc4,#ff86b3);color:#fff;box-shadow:0 6px 0 #e0689a;text-shadow:0 2px 0 rgba(0,0,0,.12)}
+.btn.pri:active{box-shadow:0 2px 0 #e0689a}
+.btn.mint{background:linear-gradient(#a6f0d2,#6fdcb4);color:#2b6b55;box-shadow:0 5px 0 #4cb990}
+.btn.big{font-size:1.5rem;padding:.75em 2em}
+.btn.round{width:48px;height:48px;padding:0;display:grid;place-items:center;font-size:1.4rem}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.star{width:34px;height:34px;display:inline-block;overflow:visible}
+.star path{fill:#fff3cf;stroke:#f3c24e;stroke-width:1.6;stroke-linejoin:round}
+.star.on path{fill:#ffd84d}
+.draggable{cursor:grab;touch-action:none}
+.draggable.grab{cursor:grabbing;z-index:50;filter:drop-shadow(0 12px 8px rgba(106,69,102,.25))}
+.bar{display:flex;align-items:center;gap:12px;padding:12px 16px}
+.bar h2{margin:0;flex:1;font-family:var(--font-d);font-size:clamp(1.2rem,4vw,1.8rem)}
+body.calm *{animation-duration:0s!important;animation-iteration-count:1!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:0s!important;animation-iteration-count:1!important}}
+
+/* =====================================================================
+   2. START SCREEN  (หน้าเริ่มเกม)
+   ===================================================================== */
+#screen-start{background:linear-gradient(#bfe3ff,#e6f4ff 42%,#ffe9f3);align-items:center;justify-content:flex-start;text-align:center}
+.cloud{position:absolute;background:#fff;border-radius:99px;opacity:.95;animation:drift 40s linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:55%;height:160%;left:12%;top:-70%}
+.cloud::after{width:40%;height:120%;right:12%;top:-45%}
+.c1{width:150px;height:44px;top:10%;left:-20%}
+.c2{width:110px;height:34px;top:24%;left:-30%;animation-duration:55s;animation-delay:-20s}
+.c3{width:190px;height:52px;top:5%;left:-40%;animation-duration:70s;animation-delay:-45s}
+@keyframes drift{to{transform:translateX(140vw)}}
+.spark{position:absolute;width:12px;height:12px;border-radius:50%;animation:twinkle 2.6s ease-in-out infinite}
+@keyframes twinkle{50%{transform:scale(1.7);opacity:.35}}
+.hill{position:absolute;left:-15%;right:-15%;bottom:-20vh;height:44vh;background:#c9f3d9;border-radius:50% 50% 0 0}
+.hill.h2{left:25%;right:-40%;bottom:-24vh;background:#ffd0e3;height:40vh}
+.logo{position:relative;z-index:2;margin-top:clamp(40px,9vh,100px);display:flex;justify-content:center;align-items:flex-end}
+.logo span{font-family:var(--font-d);font-weight:700;font-size:clamp(84px,22vw,170px);line-height:.95;-webkit-text-stroke:14px #fff;paint-order:stroke fill;text-shadow:0 10px 0 rgba(106,69,102,.2);display:inline-block;animation:bob 2.4s ease-in-out infinite;cursor:pointer}
+.logo span:nth-child(1){color:#ff8fb8}
+.logo span:nth-child(2){color:#ffcf5c;animation-delay:.25s;font-size:clamp(58px,15vw,118px);margin:0 .1em}
+.logo span:nth-child(3){color:#5fd3ac;animation-delay:.5s}
+@keyframes bob{50%{transform:translateY(-12px) rotate(-2deg)}}
+.logo span.pop{animation:popL .5s}
+@keyframes popL{40%{transform:scale(1.3) rotate(8deg)}}
+.ribbon{position:relative;z-index:2;display:inline-block;margin-top:-6px;font-family:var(--font-d);font-weight:700;font-size:clamp(1.3rem,5vw,2.2rem);letter-spacing:.12em;padding:.15em 1.4em;color:#fff;background:linear-gradient(#c7b3ff,#a98cff);border-radius:14px;box-shadow:0 6px 0 #8467e0;text-shadow:0 2px 0 rgba(0,0,0,.15)}
+.tagline{position:relative;z-index:2;margin:14px 16px 20px;font-size:clamp(1rem,3.4vw,1.3rem)}
+.start-btns{position:relative;z-index:3;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center}
+.pal{position:absolute;z-index:3;bottom:3vh;width:clamp(90px,19vw,150px)}
+.pal svg{width:100%;display:block;animation:bob 2.8s ease-in-out infinite}
+.pal.a{left:6%}.pal.b{left:calc(50% - clamp(45px,9.5vw,75px));bottom:1vh}.pal.b svg{animation-delay:.4s}.pal.c{right:6%}.pal.c svg{animation-delay:.8s}
+.floaty{position:absolute;z-index:2;width:clamp(64px,13vw,100px)}
+.floaty svg{width:100%;animation:bob 3.2s ease-in-out infinite}
+.f1{left:7%;top:44%}.f2{right:8%;top:40%}.f3{left:68%;top:56%}
+/* --- ขยับดุ๊กดิ๊ก (หน้าเริ่มเกม) --- */
+@keyframes dik{0%,100%{transform:translateY(0) rotate(-3deg) scale(1,1)}25%{transform:translateY(-16px) rotate(3deg) scale(.95,1.06)}50%{transform:translateY(0) rotate(-3deg) scale(1.06,.93)}75%{transform:translateY(-9px) rotate(3deg) scale(.98,1.03)}}
+@keyframes beat{50%{transform:scale(1.08)}}
+@keyframes wig{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes jump{0%{transform:translateY(0)}30%{transform:translateY(-80px) rotate(10deg) scale(.95,1.08)}65%{transform:translateY(0) scale(1.12,.84)}82%{transform:translateY(-14px)}100%{transform:none}}
+@keyframes puff{to{transform:translate(var(--dx),-100px) scale(1.4) rotate(20deg);opacity:0}}
+.pal svg{animation:dik 1.1s ease-in-out infinite;transform-origin:50% 100%}
+.floaty svg{animation:dik 1.7s ease-in-out infinite}
+.f2 svg{animation-delay:.5s}.f3 svg{animation-delay:.9s}
+.pal.jump svg{animation:jump .65s ease-out}
+#btn-play{animation:beat 1.1s ease-in-out infinite}
+#screen-start .ribbon{animation:wig 2.2s ease-in-out infinite}
+.spark{animation-duration:1.6s}
+.puff{position:absolute;z-index:9;pointer-events:none;font-size:1.7rem;animation:puff 1s ease-out forwards}
+/* --- อาหารหลากหลายไหลลงมา --- */
+/* --- พื้นหลังหน้าเริ่มเกมแบบใหม่ น่ารักกว่าเดิม --- */
+#screen-start{background:radial-gradient(circle at 50% 28%,#fff9dc 0,transparent 55%),linear-gradient(#a9dcff,#d9f1ff 38%,#ffeef6 72%,#ffdcec)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rays{position:absolute;left:50%;top:26%;width:170vmax;height:170vmax;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.6) 0 7deg,transparent 7deg 14deg);animation:spin 70s linear infinite;-webkit-mask:radial-gradient(circle,#000 0,transparent 50%);mask:radial-gradient(circle,#000 0,transparent 50%)}
+.rainbow{position:absolute;left:50%;top:9%;width:min(130vw,1000px);aspect-ratio:2/1;transform:translateX(-50%);opacity:.85;background:radial-gradient(circle farthest-side at 50% 100%,transparent 0 54%,#ffc2d9 54% 61%,#ffe0a8 61% 68%,#fff6b0 68% 75%,#bff0d4 75% 82%,#bfe3ff 82% 89%,#d8c9ff 89% 96%,transparent 96%)}
+.sun{position:absolute;left:5%;top:6%;width:clamp(60px,12vw,110px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbd0,#ffe27a);box-shadow:0 0 0 10px rgba(255,236,150,.5),0 0 40px 18px rgba(255,236,150,.6);animation:bob 3s ease-in-out infinite}
+.sun::after{content:"◕‿◕";position:absolute;inset:0;display:grid;place-items:center;color:#d6862e;font-size:clamp(18px,3.4vw,30px);font-weight:700}
+.cloud{box-shadow:0 8px 0 rgba(176,206,242,.55)}
+.hill{background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/26px 26px,#c9f3d9;border-top:6px solid rgba(255,255,255,.75)}
+.hill.h2{background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/26px 26px,#ffd0e3}
+.bunting{position:absolute;top:0;left:0;right:0;height:50px;display:flex;justify-content:space-around;z-index:1;pointer-events:none}
+.bunting::before{content:"";position:absolute;left:0;right:0;top:4px;height:3px;background:#fff;border-radius:2px}
+.bunting i{width:34px;height:42px;margin-top:5px;background:var(--fc);clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0;animation:swing 2s ease-in-out infinite}
+@keyframes swing{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.flowers{position:absolute;left:0;right:0;bottom:26px;z-index:2;display:flex;justify-content:space-around;align-items:flex-end;pointer-events:none}
+.flowers span{display:inline-block;transform-origin:50% 100%;animation:sway 2.4s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(9deg)}}
+/* --- หน้าเลือกเมนูแบบใหม่ น่ารัก น่าเล่น --- */
+#screen-menu{background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/30px 30px,linear-gradient(#ffe6f1,#fff3d6 50%,#dff3ff)}
+#screen-menu .bar{background:#fff;border-radius:0 0 30px 30px;box-shadow:0 6px 0 rgba(106,69,102,.12);margin-bottom:14px;text-align:center}
+#screen-menu .bar h2{font-size:clamp(1.4rem,5vw,2.1rem);color:#ff6fa5;-webkit-text-stroke:0;text-shadow:0 3px 0 #ffe0ee}
+.cards{padding:22px 16px 120px;gap:26px}
+.card{position:relative;animation:cardIn .55s cubic-bezier(.3,1.5,.5,1) backwards}
+.card:nth-child(2){animation-delay:.12s}.card:nth-child(3){animation-delay:.24s}
+@keyframes cardIn{from{transform:translateY(50px) scale(.7) rotate(-6deg);opacity:0}}
+.card:hover{transform:translateY(-8px) rotate(1deg) scale(1.02)}
+.card:hover .ico svg{animation-duration:.7s}
+.card .ico{position:relative;overflow:hidden;height:140px;background:radial-gradient(circle,rgba(255,255,255,.95) 0,transparent 62%),radial-gradient(circle,#fff 2.5px,transparent 3px) 0 0/20px 20px,var(--c)}
+.card .ico svg{height:120px;filter:drop-shadow(0 6px 0 rgba(106,69,102,.15))}
+.badge{position:absolute;left:-8px;top:-12px;width:42px;height:42px;border-radius:50%;background:var(--pink-d);color:#fff;font-family:var(--font-d);font-size:1.4rem;display:grid;place-items:center;border:4px solid #fff;box-shadow:0 3px 0 rgba(106,69,102,.2);transform:rotate(-10deg);z-index:2}
+.chip{align-self:center;padding:.1em .9em;border-radius:99px;background:var(--c);font-weight:700;font-size:.85rem;border:3px solid #fff;box-shadow:0 2px 0 rgba(106,69,102,.15)}
+.card .btn.pri{margin-top:6px;animation:beat 1.4s ease-in-out infinite}
+#menu-pal{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 4px);display:flex;align-items:flex-end;gap:6px;pointer-events:none;z-index:5}
+#menu-pal svg{width:clamp(62px,10vw,96px);animation:dik 1.2s ease-in-out infinite;transform-origin:50% 100%}
+#menu-pal .say{background:#fff;border:3px solid var(--pink);border-radius:16px 16px 4px 16px;padding:6px 10px;font-size:.8rem;font-weight:700;max-width:150px;margin-bottom:46px;box-shadow:0 3px 0 rgba(106,69,102,.12)}
+/* --- ห้องครัวแบบใหม่ ตามสีเมนูที่เลือก --- */
+.wall{background:radial-gradient(circle,rgba(255,255,255,.9) 3px,transparent 3.5px) 0 0/28px 28px,repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0 26px,transparent 26px 52px),linear-gradient(var(--th,#ffe3ef),#fff8fb)}
+.counter{background-color:var(--th2,#ffc6dc)}
+.counter::before{content:"";position:absolute;left:0;right:0;top:-6px;height:16px;background:radial-gradient(circle at 10px 0,#fff 9px,transparent 10px) 0 0/20px 16px}
+.window::before{z-index:2}
+.window i{position:absolute;top:-8px;bottom:8px;width:20px;background:var(--th2,#ffc2dc);border-radius:10px;z-index:3;box-shadow:0 3px 0 rgba(106,69,102,.12)}
+.window i:nth-of-type(1){left:-18px}.window i:nth-of-type(2){right:-18px}
+.sky{position:absolute;inset:0;overflow:hidden;border-radius:14px;z-index:1}
+.sun2{position:absolute;right:8%;top:6%;font-size:clamp(18px,3.6vw,34px);animation:spin 20s linear infinite}
+.cl2{position:absolute;top:44%;left:-30%;font-size:clamp(20px,4vw,38px);animation:drift2 12s linear infinite}
+@keyframes drift2{to{transform:translateX(220%)}}
+.wshelf{position:absolute;left:5%;top:15%;display:flex;gap:6px;padding:2px 12px 4px;border-bottom:9px solid #fff;font-size:clamp(20px,4vw,34px);box-shadow:0 8px 0 rgba(106,69,102,.1);border-radius:0 0 6px 6px}
+.lamp{position:absolute;top:30px;width:38px;height:28px;border-radius:50% 50% 6px 6px;background:radial-gradient(circle at 50% 100%,#fff6b0,#ffd36e);box-shadow:0 0 24px 10px rgba(255,226,120,.5);transform-origin:50% -30px;animation:swing 3s ease-in-out infinite}
+.lamp::before{content:"";position:absolute;left:50%;bottom:100%;width:3px;height:30px;margin-left:-1px;background:#fff}
+.l1{left:36%}.l2{left:64%;animation-delay:.8s}
+.ks{position:absolute;bottom:-30px;z-index:1;font-size:1.3rem;opacity:.75;pointer-events:none;animation:rise 9s linear infinite}
+@keyframes rise{to{transform:translateY(-100vh) rotate(25deg)}}
+#stage::before{content:"";position:absolute;left:2%;right:2%;bottom:-3%;height:20%;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 6px 0 rgba(106,69,102,.1);z-index:-1}
+.shelf:not(:empty){background:rgba(255,255,255,.6);border-radius:26px;margin:0 10px 8px clamp(80px,13vw,130px);box-shadow:0 5px 0 rgba(106,69,102,.1)}
+@media (max-width:520px){.wshelf{display:none}.window i{display:none}}
+@keyframes wobble{0%,100%{transform:scale(1,1)}50%{transform:scale(1.05,.95)}}
+.wob{transform-box:fill-box;transform-origin:50% 100%;animation:wobble 1.4s ease-in-out infinite}
+/* --- ป้ายห้อย + ธีมคาราเมลคัสตาร์ด --- */
+.sign{position:absolute;top:44px;left:50%;translate:-50% 0;padding:.2em .9em;background:#fff;border:3px dashed var(--th2,#ffc2dc);border-radius:14px;font-family:var(--font-d);font-weight:700;color:#d6568b;z-index:1;font-size:clamp(.8rem,2.6vw,1.1rem);white-space:nowrap;box-shadow:0 4px 0 rgba(106,69,102,.1);transform-origin:50% -10px;animation:swing 3.4s ease-in-out infinite;pointer-events:none}
+#kitchen[data-theme="custard"]{--pd:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Cg opacity='.6'%3E%3Cpath d='M10 28Q9 44 16 45H30Q37 44 36 28Z' fill='%23ffe28a'/%3E%3Cpath d='M8 27Q9 16 23 15Q37 16 38 27Q38 33 34 32Q32 38 29 32Q25 36 22 31Q18 38 15 32Q10 34 8 27Z' fill='%23d98a2b'/%3E%3Ccircle cx='23' cy='12' r='4' fill='%23ff5f87'/%3E%3C/g%3E%3Ccircle cx='56' cy='54' r='3' fill='%23fff'/%3E%3C/svg%3E")}
+#kitchen[data-theme="custard"] .wall{background:var(--pd) 0 0/70px 70px,var(--pd) 35px 35px/70px 70px,linear-gradient(#ffe0ee,#fff8fb)}
+#kitchen[data-theme="custard"] .flags{display:none}
+#kitchen[data-theme="custard"]::before{content:"";position:absolute;left:0;right:0;top:0;height:42px;z-index:1;pointer-events:none;background:radial-gradient(circle at 20px 100%,#d98a2b 17px,transparent 18px) 0 0/40px 100% repeat-x,radial-gradient(circle at 50px 100%,#e9a043 9px,transparent 10px) 0 0/80px 70% repeat-x,linear-gradient(#d98a2b,#d98a2b) 0 0/100% 58% no-repeat}
+/* --- หน้าเลือกเมนู รอบที่ 2: น่ารักขึ้นอีก --- */
+#menurain{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+#menurain .fall{opacity:.55}
+#screen-menu .bar{position:relative;z-index:2;border-radius:0;margin-bottom:22px}
+#screen-menu .bar::after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:12px;background:radial-gradient(circle at 12px 0,#fff 11px,transparent 12px) 0 0/24px 12px repeat-x;filter:drop-shadow(0 3px 0 rgba(106,69,102,.1))}
+#screen-menu .bar h2 small{display:block;font-family:var(--font);font-size:.8rem;font-weight:500;color:var(--ink-2);text-shadow:none;margin-top:2px}
+.cards{position:relative;z-index:1}
+.card{background:linear-gradient(#fff 55%,color-mix(in srgb,var(--c) 40%,#fff));outline:3px dashed rgba(255,255,255,.95);outline-offset:-11px}
+.card::after{content:"✨";position:absolute;right:12px;top:10px;font-size:1.2rem;animation:twinkle 2s ease-in-out infinite}
+.card .ico::before{content:"";position:absolute;inset:-60%;background:repeating-conic-gradient(rgba(255,255,255,.55) 0 10deg,transparent 10deg 20deg);animation:spin 40s linear infinite}
+.card .ico svg{position:relative}
+@keyframes hop{50%{transform:translateY(-14px) scale(1.07)}}
+.card:hover .ico svg{animation:hop .6s ease-in-out infinite}
+.card .meta{margin:0;font-size:.82rem;color:var(--ink-2)}
+/* --- หน้าเลือกเมนู รอบที่ 3: น่าเล่น --- */
+.cards{padding:50px 16px 120px}
+.card{cursor:pointer;transform:none;transition:transform .12s ease-out}
+.card:hover{transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-8px) scale(1.03)}
+.peek{position:absolute;right:22px;top:-36px;width:64px;height:40px;overflow:hidden;pointer-events:none;transition:height .25s cubic-bezier(.3,1.7,.5,1),top .25s cubic-bezier(.3,1.7,.5,1)}
+.peek svg{width:64px;display:block}
+.card:hover .peek{height:58px;top:-54px}
+.sticker{position:absolute;left:8px;bottom:8px;padding:.15em .7em;background:#fff;border-radius:99px;font-size:.78rem;font-weight:700;color:#d6568b;box-shadow:0 3px 0 rgba(106,69,102,.15);transform:rotate(-4deg);z-index:2}
+/* --- หน้าหลัก เก็บขนม + เพื่อนพูดได้ --- */
+#foodrain .fall{pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.fall.popped{animation:popout .4s ease-out forwards!important}
+@keyframes popout{0%{transform:scale(1)}100%{transform:scale(2.3) rotate(30deg);opacity:0}}
+#catch{position:absolute;right:12px;top:58px;z-index:4;padding:.25em .9em;background:#fff;border:3px solid var(--pink);border-radius:99px;font-weight:700;font-size:.95rem;box-shadow:0 4px 0 rgba(106,69,102,.15);pointer-events:none}
+#catch b{color:#ff6fa5;font-family:var(--font-d);font-size:1.15em}
+#catch.bump{animation:bumpc .3s}
+@keyframes bumpc{50%{transform:scale(1.25) rotate(-3deg)}}
+.speech{position:absolute;left:50%;top:-34px;translate:-50% 0;background:#fff;border:3px solid var(--pink);border-radius:16px;padding:.2em .8em;font-weight:700;font-size:.85rem;white-space:nowrap;color:var(--ink);pointer-events:none;box-shadow:0 3px 0 rgba(106,69,102,.12);animation:sp 1.9s ease-out forwards}
+@keyframes sp{0%{opacity:0;transform:translateY(10px) scale(.6)}12%{opacity:1;transform:scale(1.08)}22%{transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+#btn-play:hover{animation:beat .35s ease-in-out infinite}
+#btn-set-start{position:absolute;top:56px;right:12px;z-index:5}
+#btn-set-start:hover{transform:rotate(70deg)}
+#catch{right:70px;top:62px}
+#catch{display:none!important}
+/* --- หน้าหลัก รอบที่ 2: ร้านขนมน่ารัก --- */
+.awning{position:absolute;top:0;left:0;right:0;height:46px;z-index:4;pointer-events:none;background:repeating-linear-gradient(90deg,#ff9fc4 0 38px,#fff 38px 76px);box-shadow:0 5px 0 rgba(106,69,102,.12)}
+.awning::after{content:"";position:absolute;left:0;right:0;top:100%;height:20px;background:radial-gradient(circle at 19px 0,#ff9fc4 19px,transparent 20px) 0 0/76px 20px repeat-x,radial-gradient(circle at 57px 0,#fff 19px,transparent 20px) 0 0/76px 20px repeat-x;filter:drop-shadow(0 4px 0 rgba(106,69,102,.1))}
+#screen-start .bunting{display:none}
+#screen-start .sun{top:13%}
+#screen-start .rainbow{top:13%}
+#screen-start .logo{margin-top:clamp(70px,12vh,130px)}
+#btn-set-start{top:76px}
+#screen-start .hintline{position:relative;bottom:auto;left:auto;right:auto;margin:14px 12px 0;display:inline-block;padding:.25em 1em;background:rgba(255,255,255,.8);border-radius:99px;z-index:3}
+.tagline{display:inline-block;padding:.35em 1.2em;background:rgba(255,255,255,.85);border:3px dashed var(--pink);border-radius:99px;box-shadow:0 4px 0 rgba(106,69,102,.1)}
+.logo::before,.logo::after{position:absolute;font-size:clamp(22px,5vw,38px);animation:twinkle 2s ease-in-out infinite}
+.logo::before{content:"✨";left:-4%;top:-8%}
+.logo::after{content:"💖";right:-4%;top:6%;animation-delay:.7s}
+.logo span{position:relative}
+.logo span:nth-child(1)::before{content:"🍓";position:absolute;left:-.02em;top:-.08em;font-size:.28em;-webkit-text-stroke:0;text-shadow:none}
+.logo span:nth-child(3)::after{content:"🎀";position:absolute;right:-.04em;top:-.06em;font-size:.3em;-webkit-text-stroke:0;text-shadow:none;transform:rotate(15deg)}
+#btn-play{position:relative;overflow:hidden}
+#btn-play::after{content:"";position:absolute;top:0;bottom:0;width:36px;left:-60px;background:rgba(255,255,255,.55);transform:skewX(-20deg);animation:shine 2.6s ease-in-out infinite}
+@keyframes shine{0%,60%{left:-60px}100%{left:120%}}
+.pal::after{content:"";position:absolute;left:12%;right:12%;bottom:-6px;height:14px;border-radius:50%;background:rgba(106,69,102,.16);z-index:-1}
+.balloon{position:absolute;bottom:-130px;width:44px;height:54px;border-radius:50% 50% 48% 48%;background:radial-gradient(circle at 35% 30%,#fff 0 8%,transparent 9%),var(--bc);box-shadow:inset -6px -8px 0 rgba(106,69,102,.1);z-index:1;pointer-events:none;animation:balloon linear infinite}
+.balloon::before{content:"";position:absolute;left:50%;bottom:-6px;translate:-50% 0;border:6px solid transparent;border-top:0;border-bottom:7px solid var(--bc)}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:46px;margin-top:1px;background:rgba(255,255,255,.9)}
+@keyframes balloon{0%{transform:translate(0,0)}25%{transform:translate(16px,-32vh)}50%{transform:translate(-10px,-64vh)}75%{transform:translate(16px,-96vh)}100%{transform:translate(0,-130vh)}}
+/* --- หน้าหลัก รอบที่ 3: พาสเทลฝันหวาน + ฟองสบู่แตะได้ --- */
+.logo span:nth-child(1)::before,.logo span:nth-child(3)::after{content:none}
+#screen-start{background:radial-gradient(circle at 18% 14%,#fff 0,transparent 30%),radial-gradient(circle at 82% 26%,#ffe9f4 0,transparent 36%),linear-gradient(#cfe9ff,#e8e2ff 45%,#ffe6f1 75%,#fff0df)}
+.awning{background:repeating-linear-gradient(90deg,#ffc4dd 0 38px,#fff 38px 76px)}
+.awning::after{background:radial-gradient(circle at 19px 0,#ffc4dd 19px,transparent 20px) 0 0/76px 20px repeat-x,radial-gradient(circle at 57px 0,#fff 19px,transparent 20px) 0 0/76px 20px repeat-x}
+#screen-start .rainbow{opacity:.7}
+.hill{background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/26px 26px,#d4f5e2}
+.hill.h2{background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/26px 26px,#ffdbe9}
+.logo span:nth-child(1){color:#ff9ec4}.logo span:nth-child(2){color:#ffd978}.logo span:nth-child(3){color:#7fe0c0}
+.ribbon{background:linear-gradient(#dccdff,#c5b2ff);box-shadow:0 6px 0 #a893f0}
+#btn-play{background:linear-gradient(#ffbcd6,#ffa3c6);box-shadow:0 6px 0 #f07ba8}
+.bub2{position:absolute;bottom:-90px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#fff 0 12%,rgba(255,255,255,.15) 14%,rgba(190,225,255,.25) 70%,rgba(255,200,230,.5));border:2px solid rgba(255,255,255,.95);box-shadow:inset 0 0 12px rgba(255,255,255,.7),0 4px 10px rgba(150,180,230,.25);z-index:1;cursor:pointer;touch-action:manipulation;animation:bubb linear infinite}
+@keyframes bubb{0%{transform:translate(0,0)}33%{transform:translate(18px,-38vh)}66%{transform:translate(-14px,-76vh)}100%{transform:translate(6px,-118vh)}}
+.bub2.gone{animation:popb .3s ease-out forwards;pointer-events:none}
+@keyframes popb{to{transform:scale(1.9);opacity:0}}
+#foodrain{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.fall{position:absolute;top:-70px;line-height:1;animation:fall2 linear forwards;filter:drop-shadow(0 4px 0 rgba(106,69,102,.16))}
+@keyframes fall2{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(var(--sw),55vh) rotate(calc(var(--rot)*.5))}100%{transform:translate(calc(var(--sw)*-1),118vh) rotate(var(--rot))}}
+.hintline{position:absolute;z-index:3;bottom:calc(env(safe-area-inset-bottom,0px) + 6px);left:0;right:0;font-size:.85rem;color:var(--ink-2)}
+
+/* =====================================================================
+   3. MENU SCREEN  (เลือกเมนู + ดาวบอกความยาก)
+   ===================================================================== */
+#screen-menu{background:linear-gradient(#fff4d6,#ffe3ef 60%,#e3f4ff)}
+.cards{flex:1;overflow:auto;display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-content:flex-start;padding:10px 16px 28px}
+.card{width:min(100%,300px);background:#fff;border-radius:28px;padding:16px;text-align:center;box-shadow:0 8px 0 rgba(106,69,102,.15);border:4px solid var(--c,#ffc8dd);display:flex;flex-direction:column;gap:6px;transition:transform .15s}
+.card:hover{transform:translateY(-4px) rotate(-.6deg)}
+.card .ico{height:130px;border-radius:20px;background:var(--c,#ffc8dd);display:grid;place-items:center}
+.card .ico svg{height:112px;animation:bob 2.6s ease-in-out infinite}
+.card h3{margin:6px 0 0;font-size:1.3rem}
+.card .sub{margin:0;color:var(--ink-2);font-size:.9rem}
+.diff{display:flex;align-items:center;justify-content:center;gap:2px;font-size:.9rem;color:var(--ink-2)}
+.diff .star{width:40px;height:40px;cursor:grab;touch-action:none;animation:twinkleS 2.4s ease-in-out infinite}
+.diff .star:nth-of-type(2){animation-delay:.3s}.diff .star:nth-of-type(3){animation-delay:.6s}
+.diff .star.on{filter:drop-shadow(0 3px 0 rgba(243,194,78,.5))}
+@keyframes twinkleS{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(6deg) scale(1.12)}}
+.star.spin{animation:spinS .6s!important}
+@keyframes spinS{to{transform:rotate(360deg) scale(1.3)}}
+.best{font-size:.85rem;color:var(--ink-2);min-height:1.4em}
+.best .star{width:18px;height:18px}
+
+/* =====================================================================
+   4. GAME SCREEN  (ห้องครัว)
+   ===================================================================== */
+#screen-game{background:#ffe9f1}
+.g-top{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;box-shadow:0 4px 0 rgba(106,69,102,.1);z-index:5}
+.g-top .title{flex:1;min-width:0}
+.g-top b{display:block;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.dots i{width:12px;height:12px;border-radius:50%;background:#f1e1ee}
+.dots i.now{background:var(--pink);transform:scale(1.25)}
+.dots i.done{background:var(--mint-d)}
+.kitchen{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.wall{position:absolute;inset:0 0 40% 0;background:radial-gradient(circle,#fff 3px,transparent 3.5px) 0 0/28px 28px,#ffe3ef}
+.counter{position:absolute;left:0;right:0;bottom:0;height:46%;background:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0 14px,transparent 14px 28px),repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0 14px,transparent 14px 28px),#ffc6dc;border-top:8px solid #fff}
+.window{position:absolute;top:8%;right:6%;width:clamp(70px,14vw,130px);aspect-ratio:1;border-radius:20px;border:6px solid #fff;background:linear-gradient(#bfe3ff,#e9f6ff);box-shadow:0 5px 0 rgba(106,69,102,.12)}
+.window::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;background:#fff;transform:translateX(-50%)}
+.flags{position:absolute;top:0;left:0;right:0;height:34px;display:flex;justify-content:space-around}
+.flags i{width:30px;height:34px;background:var(--fc);clip-path:polygon(0 0,100% 0,50% 100%)}
+#stage{position:relative;z-index:2;margin:auto;width:min(84vw,440px,60vh);aspect-ratio:320/260;touch-action:pan-y}
+#stage.ptr{touch-action:none;cursor:grab}
+#stage.over{outline:5px dashed #fff;outline-offset:6px;border-radius:30px;background:rgba(255,255,255,.35)}
+#stage svg{width:100%;height:100%;display:block;overflow:visible}
+.tapT{cursor:pointer;transform-box:fill-box;transform-origin:center}
+body:not(.nohint) .tapT{animation:pulseT 1s ease-in-out infinite}
+@keyframes pulseT{50%{transform:scale(1.07)}}
+.flame{animation:flick .3s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:bottom}
+@keyframes flick{to{transform:scale(1.15,.82)}}
+.bub{animation:bubUp 1.2s ease-in infinite}
+@keyframes bubUp{0%{transform:translateY(8px) scale(.5);opacity:0}30%{opacity:1}100%{transform:translateY(-14px) scale(1);opacity:0}}
+.steam{animation:steamUp 2s ease-out infinite}
+@keyframes steamUp{0%{transform:translateY(8px);opacity:0}30%{opacity:.9}100%{transform:translateY(-22px);opacity:0}}
+.dust{animation:dustD .55s linear infinite}
+@keyframes dustD{0%{transform:translateY(0);opacity:1}100%{transform:translateY(60px);opacity:0}}
+.plop{position:absolute;left:46%;top:2%;font-size:2.6rem;z-index:6;pointer-events:none;animation:plop .7s ease-in forwards}
+@keyframes plop{0%{transform:translateY(-20px) scale(1.2);opacity:1}80%{transform:translateY(110px) scale(.8);opacity:1}100%{transform:translateY(125px) scale(.2);opacity:0}}
+.pstars{position:absolute;left:50%;top:30%;z-index:8;transform:translateX(-50%);pointer-events:none;text-align:center;animation:pst 1.2s ease-out forwards;white-space:nowrap}
+.pstars .star{width:44px;height:44px}
+.pstars p{margin:0;font-weight:700;font-size:1.3rem;color:#fff;-webkit-text-stroke:6px var(--pink-d);paint-order:stroke fill}
+@keyframes pst{0%{transform:translate(-50%,20px) scale(.3);opacity:0}25%{transform:translate(-50%,-6px) scale(1.15);opacity:1}100%{transform:translate(-50%,-60px) scale(1);opacity:0}}
+.shake{animation:shk .4s}
+@keyframes shk{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+#char{position:absolute;z-index:4;left:1%;bottom:calc(var(--shelf,96px) + 6px);width:clamp(78px,14vw,130px)}
+#char svg{width:100%;display:block;animation:bob 2.6s ease-in-out infinite}
+.arm-r{transform-origin:90px 118px;animation:wave 1.6s ease-in-out infinite}
+@keyframes wave{50%{transform:rotate(-24deg)}}
+.eyes{animation:blink 4s infinite;transform-origin:60px 80px}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.shelf{position:relative;z-index:3;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px 10px 10px;min-height:var(--shelf,96px);align-items:flex-end;margin-left:clamp(70px,12vw,120px)}
+.ing{font:inherit;display:flex;flex-direction:column;align-items:center;gap:0;padding:6px 10px 5px;min-width:78px;background:#fff;border:3px solid var(--pink);border-radius:18px;color:var(--ink);box-shadow:0 5px 0 #f0b7cf;cursor:grab;touch-action:none}
+.ing .e{font-size:1.9rem;line-height:1.1}
+.ing b{font-size:.78rem}
+.ing small{font-size:.72rem;color:var(--ink-2)}
+.ing.used{opacity:.25;pointer-events:none;filter:grayscale(1)}
+.ing.ghost{position:fixed;z-index:200;pointer-events:none;transform:translate(-50%,-60%) rotate(-6deg) scale(1.15);opacity:.95}
+.panel{position:relative;z-index:6;background:#fff;border-radius:26px 26px 0 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -5px 0 rgba(106,69,102,.1);display:flex;flex-direction:column;gap:8px}
+.bubble{background:var(--butter);border:3px solid var(--butter-d);border-radius:20px;padding:10px 14px;font-size:clamp(.95rem,3.2vw,1.1rem);line-height:1.45;min-height:3.3em}
+body.nocap .bubble{visibility:hidden;min-height:0;height:0;padding:0;border:0}
+.tipline{font-size:.85rem;color:var(--ink-2)}
+.instr{font-size:.85rem;font-weight:700;color:#d6568b}
+.meter{position:relative;height:22px;border-radius:99px;background:#f4e6f5;border:3px solid #fff;outline:2px solid #f0d3ea;overflow:hidden}
+.meter.off{display:none}
+.fillbar{height:100%;width:0;background:linear-gradient(90deg,#ffb3d1,#ffd36e);border-radius:99px;transition:width .1s}
+.zone{position:absolute;top:0;bottom:0;background:#8fe5bf}
+.needle{position:absolute;top:0;bottom:0;width:7px;margin-left:-3px;background:var(--ink);border-radius:4px}
+.meter.time .fillbar,.meter.fill .zone,.meter.fill .needle{display:none}
+#act{align-self:center}
+#act.hidden{display:none}
+
+/* =====================================================================
+   5. SETTINGS / RECIPE BOOK  (หน้าต่างตั้งค่า)
+   ===================================================================== */
+.overlay{position:absolute;inset:0;z-index:100;background:rgba(106,69,102,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{width:min(100%,460px);max-height:100%;overflow:auto;background:#fff;border-radius:28px;padding:20px;border:5px solid var(--pink);box-shadow:0 10px 0 rgba(106,69,102,.2)}
+.modal h2{margin:0 0 12px;font-family:var(--font-d);display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:2px dashed #f6dcea}
+.row label{font-weight:700;white-space:nowrap}
+.seg{flex-wrap:wrap;justify-content:flex-end}
+.row input[type=range]{width:46%;accent-color:#ff86b3;height:28px}
+.switch{appearance:none;width:54px;height:30px;border-radius:99px;background:#e9d9e6;position:relative;cursor:pointer;transition:background .2s;flex:none}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 0 rgba(0,0,0,.15);transition:left .2s}
+.switch:checked{background:var(--mint-d)}
+.switch:checked::after{left:27px}
+.seg{display:flex;gap:6px}
+.seg button{font:inherit;font-weight:700;border:3px solid #f6cfe1;background:#fff;color:var(--ink);border-radius:14px;padding:.3em .7em;cursor:pointer}
+.seg button.on{background:var(--pink);border-color:var(--pink-d);color:#fff}
+.seg.chars button{padding:2px 6px 0}
+.seg.chars svg{width:46px;display:block}
+.book h3{margin:12px 0 4px;font-size:1rem;color:#d6568b}
+.book ul{margin:0;padding-left:1.2em;line-height:1.6}
+
+/* =====================================================================
+   6. RESULT SCREEN  (สรุปผล)
+   ===================================================================== */
+#screen-result{background:linear-gradient(#fff0b3,#ffd6e8);align-items:center;justify-content:center;padding:16px}
+.res{position:relative;z-index:2;width:min(100%,420px);background:#fff;border-radius:32px;padding:22px;text-align:center;border:5px solid var(--pink);box-shadow:0 10px 0 rgba(106,69,102,.2)}
+.res .ico svg{height:130px;animation:bob 2s ease-in-out infinite}
+.res h2{margin:6px 0;font-family:var(--font-d);font-size:1.8rem}
+.res .stars .star{width:56px;height:56px;animation:popIn .5s backwards}
+.res .stars .star:nth-child(2){animation-delay:.25s}.res .stars .star:nth-child(3){animation-delay:.5s}
+@keyframes popIn{from{transform:scale(0) rotate(-90deg)}}
+.res .acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.conf{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:fall linear forwards;z-index:1}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+body.calm .pstars{animation:none!important;opacity:1}
+#screen-start .start-btns{z-index:6}
+#screen-start .tagline{z-index:6}
+@media (max-height:560px){
+  .g-top{padding:4px 10px}.g-top .btn.round{width:38px;height:38px;font-size:1.1rem}
+  .panel{padding:6px 12px 6px;gap:3px;border-radius:18px 18px 0 0}
+  .bubble{min-height:0;padding:5px 10px;font-size:.85rem;line-height:1.3}
+  .tipline{display:none}.instr{font-size:.75rem}.meter{height:16px}
+  #stage{width:min(60vw,300px,46vh)}
+  .shelf{min-height:0;padding:2px 8px 4px}.ing{padding:3px 8px;min-width:64px}.ing .e{font-size:1.4rem}
+  #char{width:64px;bottom:10px}
+  .wshelf,.sign,.lamp{display:none}
+  #screen-menu .bar{padding:6px 12px}.cards{padding-top:46px}
+  #screen-start .logo{margin-top:64px}
+  #screen-start .logo span{font-size:clamp(60px,18vh,110px)}
+  #screen-start .logo span:nth-child(2){font-size:clamp(40px,12vh,76px)}
+  .pal{width:70px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ HTML: SCREENS ============================ -->
+<section id="screen-start" class="screen active" aria-label="หน้าเริ่มเกม">
+  <div class="rays"></div><div class="rainbow"></div><div class="sun"></div>
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+  <div id="sparkles"></div>
+  <div id="foodrain" aria-hidden="true"></div>
+  <div class="awning" aria-hidden="true"></div>
+  <div class="hill"></div><div class="hill h2"></div>
+  <div class="logo" id="logo"><span>N</span><span>&amp;</span><span>J</span></div>
+  <div class="ribbon">restaurant</div>
+  <p class="tagline">ร้านอาหารสุดน่ารัก เปิดแล้ววันนี้! มาทำขนมด้วยกันนะ 🍰</p>
+  <div class="start-btns">
+    <button class="btn pri big" id="btn-play">▶ เริ่มเกม</button>
+    
+  </div>
+  <div class="floaty f1" id="fl-1"></div><div class="floaty f2" id="fl-2"></div><div class="floaty f3" id="fl-3"></div>
+  <div class="pal a" id="pal-bunny"></div><div class="pal b" id="pal-cat"></div><div class="pal c" id="pal-bear"></div>
+  <button class="btn round" id="btn-set-start" aria-label="ตั้งค่า">⚙️</button>
+  <div class="hintline">แตะขนมที่ตกลงมาเพื่อเก็บ! ลากเพื่อน ๆ เล่นได้ด้วยนะ 🍬</div>
+</section>
+
+<section id="screen-menu" class="screen" aria-label="เลือกเมนู">
+  <header class="bar">
+    <button class="btn round" id="menu-back" aria-label="กลับ">‹</button>
+    <h2>✨ เลือกเมนูวันนี้ ✨<small>แตะการ์ดเพื่อเริ่มทำอาหาร · ลากดาวเล่นได้นะ!</small></h2>
+    <button class="btn round" data-open="settings" aria-label="ตั้งค่า">⚙️</button>
+  </header>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section id="screen-game" class="screen" aria-label="ห้องครัว">
+  <header class="g-top">
+    <button class="btn round" id="game-back" aria-label="กลับไปเลือกเมนู">‹</button>
+    <div class="title"><b id="g-name"></b><div class="dots" id="dots"></div></div>
+    <button class="btn round" id="btn-book" aria-label="สูตรอาหาร">📖</button>
+    <button class="btn round" data-open="settings" aria-label="ตั้งค่า">⚙️</button>
+  </header>
+  <div class="kitchen" id="kitchen">
+    <div class="wall"></div><div class="flags" id="flags"></div>
+    <div class="wshelf"><span>🍬</span><span>🍯</span><span>🧁</span><span>☕</span><span>🌷</span></div>
+    <div class="lamp l1"></div><div class="lamp l2"></div>
+    <div class="window"><i></i><i></i><b class="sky"><span class="sun2">☀️</span><span class="cl2">☁️</span></b></div>
+    <div class="counter"></div>
+    <span class="ks" style="left:8%;animation-delay:0s">💖</span><span class="ks" style="left:24%;animation-delay:2.5s">✨</span><span class="ks" style="left:42%;animation-delay:5s">⭐</span><span class="ks" style="left:58%;animation-delay:1.2s">🌸</span><span class="ks" style="left:74%;animation-delay:3.8s">💖</span><span class="ks" style="left:90%;animation-delay:6.3s">✨</span>
+    <div id="stage"><div id="stageSvg"></div></div>
+    <div id="char" class="draggable" aria-label="ตัวละคร ลากได้"></div>
+    <div class="shelf" id="shelf"></div>
+  </div>
+  <div class="panel">
+    <div class="bubble" id="say" aria-live="polite"></div>
+    <div class="tipline" id="tip"></div>
+    <div class="instr" id="instr"></div>
+    <div class="meter off" id="meter"><div class="fillbar" id="mfill"></div><div class="zone" id="mzone"></div><div class="needle" id="mneedle"></div></div>
+    <button class="btn pri hidden" id="act"></button>
+  </div>
+</section>
+
+<section id="screen-result" class="screen" aria-label="สรุปผล">
+  <div class="res">
+    <div class="ico" id="res-ico"></div>
+    <h2 id="res-title"></h2>
+    <div class="stars" id="res-stars"></div>
+    <p id="res-msg"></p>
+    <div class="acts"><button class="btn pri" id="res-again">🔁 ทำอีกครั้ง</button><button class="btn mint" id="res-menu">🍰 เลือกเมนูอื่น</button></div>
+  </div>
+</section>
+
+<!-- Settings window -->
+<div class="overlay" id="settings" role="dialog" aria-modal="true" aria-label="ตั้งค่า">
+  <div class="modal">
+    <h2>⚙️ ตั้งค่า <button class="btn round" data-close aria-label="ปิด">✕</button></h2>
+    <div class="row"><label for="s-music">🎵 เพลงประกอบ</label><input type="range" id="s-music" min="0" max="1" step=".05"></div>
+    <div class="row"><label for="s-sfx">🔔 เสียงเอฟเฟกต์</label><input type="range" id="s-sfx" min="0" max="1" step=".05"></div>
+    <div class="row"><label for="s-mute">🔇 ปิดเสียงทั้งหมด</label><input type="checkbox" class="switch" id="s-mute"></div>
+    <div class="row"><label for="s-cap">💬 คำบรรยายตอนทำอาหาร</label><input type="checkbox" class="switch" id="s-cap"></div>
+    <div class="row"><label for="s-hint">✨ ไฮไลต์จุดที่ต้องแตะ</label><input type="checkbox" class="switch" id="s-hint"></div>
+    <div class="row"><label for="s-calm">🍃 ลดการเคลื่อนไหว</label><input type="checkbox" class="switch" id="s-calm"></div>
+    <div class="row"><label>🎯 ตัวช่วย</label><div class="seg" id="s-assist"><button data-v="easy">ง่ายขึ้น</button><button data-v="normal">ปกติ</button><button data-v="hard">ท้าทาย</button></div></div>
+    <div class="row"><label>🧑‍🍳 เชฟของฉัน</label><div class="seg chars" id="s-char"></div></div>
+    <div class="row" style="border:0"><label>🗑 ล้างคะแนนดาว</label><button class="btn" id="s-reset">ล้าง</button></div>
+  </div>
+</div>
+
+<!-- Recipe book window -->
+<div class="overlay" id="book" role="dialog" aria-modal="true" aria-label="สูตรอาหาร">
+  <div class="modal book">
+    <h2 id="book-title">📖 สูตร <button class="btn round" data-close aria-label="ปิด">✕</button></h2>
+    <div id="book-body"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   MODULE 0 · UTILS
+   ===================================================================== */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t;
+const hex=h=>{h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.substr(i,2),16))};
+const mix=(a,b,t)=>{const x=hex(a),y=hex(b);return '#'+x.map((v,i)=>Math.round(lerp(v,y[i],clamp(t,0,1))).toString(16).padStart(2,'0')).join('')};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const starSVG=on=>`<svg viewBox="0 0 24 24" class="star ${on?'on':''}" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>`;
+
+/* =====================================================================
+   MODULE 1 · SETTINGS + PROGRESS  (ตั้งค่า / บันทึกคะแนน)
+   ===================================================================== */
+const Settings={
+  d:{music:.5,sfx:.8,mute:false,captions:true,hints:true,calm:false,assist:'normal',char:'bunny'},
+  load(){try{const s=localStorage.getItem('nj_settings');if(s)Object.assign(this.d,JSON.parse(s))}catch(e){}
+    const d=this.d;d.music=clamp(+d.music||0,0,1);d.sfx=clamp(+d.sfx||0,0,1);
+    if(!['easy','normal','hard'].includes(d.assist))d.assist='normal';
+    if(!['bunny','cat','bear'].includes(d.char))d.char='bunny';
+    ['mute','captions','hints','calm'].forEach(k=>d[k]=!!d[k]);},
+  save(){try{localStorage.setItem('nj_settings',JSON.stringify(this.d))}catch(e){}},
+  set(k,v){this.d[k]=v;this.save();this.apply()},
+  apply(){
+    Sound.setVolumes();
+    document.body.classList.toggle('calm',this.d.calm);
+    document.body.classList.toggle('nohint',!this.d.hints);
+    document.body.classList.toggle('nocap',!this.d.captions);
+    Chars.refresh();
+  },
+  assist(){return {easy:{zone:1.5,speed:.75,gentle:1.5,rev:.7},normal:{zone:1,speed:1,gentle:1,rev:1},hard:{zone:.7,speed:1.25,gentle:.75,rev:1.2}}[this.d.assist]}
+};
+const Progress={best:{},
+  load(){try{this.best=JSON.parse(localStorage.getItem('nj_best')||'{}')}catch(e){this.best={}}},
+  save(){try{localStorage.setItem('nj_best',JSON.stringify(this.best))}catch(e){}}
+};
+
+/* =====================================================================
+   MODULE 2 · SOUND  (เสียงเกมสังเคราะห์ ไม่ต้องโหลดไฟล์)
+   ===================================================================== */
+const N={C4:261.6,C5:523.3,D5:587.3,E5:659.3,G5:784,A5:880,C6:1046.5};
+const MEL=[N.E5,0,N.G5,N.E5,N.A5,0,N.G5,0, N.E5,0,N.D5,N.C5,N.D5,0,N.E5,0, N.G5,0,N.A5,N.G5,N.E5,0,N.C5,0, N.D5,N.E5,N.D5,N.C5,N.C5,0,0,0];
+const BASS=[130.8,130.8,110,110,87.3,87.3,98,98];
+const Sound={
+  ctx:null,on:false,next:0,beat:0,timer:null,
+  init(){
+    if(this.ctx)return;
+    try{
+      const C=window.AudioContext||window.webkitAudioContext; const c=this.ctx=new C();
+      this.master=c.createGain(); this.mus=c.createGain(); this.sfx=c.createGain();
+      this.mus.connect(this.master); this.sfx.connect(this.master); this.master.connect(c.destination);
+      const buf=c.createBuffer(1,c.sampleRate,c.sampleRate), d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; this.noise=buf; this.setVolumes();
+    }catch(e){this.ctx=null}
+  },
+  resume(){this.init();if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume()},
+  setVolumes(){if(!this.ctx)return;this.master.gain.value=Settings.d.mute?0:1;this.mus.gain.value=Settings.d.music*.45;this.sfx.gain.value=Settings.d.sfx},
+  tone(f,t,dur,type='sine',vol=.2,dest){
+    const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);g.connect(dest||this.sfx);o.start(t);o.stop(t+dur+.05);
+  },
+  slide(f1,f2,t,dur,type,vol){
+    const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(this.sfx);o.start(t);o.stop(t+dur+.05);
+  },
+  hiss(t,dur,freq,q,vol){
+    const c=this.ctx,s=c.createBufferSource();s.buffer=this.noise;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=q;
+    const g=c.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(this.sfx);s.start(t);s.stop(t+dur);
+  },
+  play(n){
+    if(!this.ctx||Settings.d.mute)return; const t=this.ctx.currentTime;
+    switch(n){
+      case 'pop':this.slide(420,900,t,.12,'sine',.25);break;
+      case 'click':this.tone(880,t,.08,'triangle',.2);break;
+      case 'tap':this.slide(600,1000,t,.1,'triangle',.25);this.tone(1500,t+.05,.08,'sine',.12);break;
+      case 'ding':[N.E5,N.G5,N.C6].forEach((f,i)=>this.tone(f,t+i*.08,.35,'triangle',.25));break;
+      case 'star':[N.C5,N.E5,N.G5,N.C6,N.E5*2].forEach((f,i)=>this.tone(f,t+i*.07,.45,'triangle',.25));break;
+      case 'oops':this.slide(380,200,t,.3,'sawtooth',.12);this.slide(300,160,t+.12,.3,'sawtooth',.1);break;
+      case 'splash':this.hiss(t,.35,900,.8,.5);this.slide(500,250,t,.15,'sine',.15);break;
+      case 'whoosh':this.hiss(t,.18,1800,1.5,.12);break;
+      case 'sizzle':this.hiss(t,.5,5000,.6,.18);break;
+      case 'win':[N.C5,N.E5,N.G5,N.C6,N.G5,N.C6,N.E5*2,N.G5*2].forEach((f,i)=>this.tone(f,t+i*.11,.5,'triangle',.28));break;
+    }
+  },
+  startMusic(){this.resume();if(!this.ctx||this.on)return;this.on=true;this.next=this.ctx.currentTime+.1;this.beat=0;this.timer=setInterval(()=>this.sched(),120)},
+  sched(){
+    const c=this.ctx,spb=60/116/2;
+    while(this.next<c.currentTime+.4){
+      const b=this.beat%32,m=MEL[b];
+      if(m)this.tone(m,this.next,spb*1.8,'triangle',.22,this.mus);
+      if(b%4===0)this.tone(BASS[b/4],this.next,spb*3.4,'sine',.32,this.mus);
+      if(b%8===4)this.tone(N.C6,this.next,spb,'sine',.05,this.mus);
+      this.next+=spb;this.beat++;
+    }
+  }
+};
+
+/* =====================================================================
+   MODULE 3 · CHARACTERS  (ตัวละครน่ารัก SVG)
+   ===================================================================== */
+const CHARS={
+  bunny:{n:'บันนี่',fur:'#ffe6f0',inn:'#ffb3d1',ear:'bunny'},
+  cat:{n:'มีโอ',fur:'#fff2cc',inn:'#ffc9a8',ear:'cat'},
+  bear:{n:'หมีหม่ำ',fur:'#ffddc2',inn:'#f3b48d',ear:'bear'}
+};
+function charSVG(k,mood='happy'){
+  const c=CHARS[k],st='stroke="#e6a9c0" stroke-width="2"';
+  let ears='';
+  if(c.ear==='bunny')ears=`<ellipse cx="40" cy="28" rx="11" ry="28" fill="${c.fur}" ${st}/><ellipse cx="40" cy="30" rx="5.5" ry="19" fill="${c.inn}"/><ellipse cx="80" cy="28" rx="11" ry="28" fill="${c.fur}" ${st}/><ellipse cx="80" cy="30" rx="5.5" ry="19" fill="${c.inn}"/>`;
+  else if(c.ear==='cat')ears=`<path d="M24 58 L28 16 L58 44Z" fill="${c.fur}" ${st} stroke-linejoin="round"/><path d="M96 58 L92 16 L62 44Z" fill="${c.fur}" ${st} stroke-linejoin="round"/><path d="M30 46 L32 27 L46 40Z" fill="${c.inn}"/><path d="M90 46 L88 27 L74 40Z" fill="${c.inn}"/>`;
+  else ears=`<circle cx="30" cy="48" r="15" fill="${c.fur}" ${st}/><circle cx="30" cy="48" r="7.5" fill="${c.inn}"/><circle cx="90" cy="48" r="15" fill="${c.fur}" ${st}/><circle cx="90" cy="48" r="7.5" fill="${c.inn}"/>`;
+  const eyes=mood==='cheer'
+    ?`<path d="M40 83 Q46 74 52 83" stroke="#4a2f45" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M68 83 Q74 74 80 83" stroke="#4a2f45" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    :`<g class="eyes"><ellipse cx="46" cy="81" rx="4.8" ry="6" fill="#4a2f45"/><circle cx="47.8" cy="78.6" r="1.8" fill="#fff"/><ellipse cx="74" cy="81" rx="4.8" ry="6" fill="#4a2f45"/><circle cx="75.8" cy="78.6" r="1.8" fill="#fff"/></g>`;
+  const mouth=mood==='cheer'?`<path d="M52 91 Q60 106 68 91Z" fill="#d6577a"/>`
+    :mood==='oops'?`<ellipse cx="60" cy="96" rx="4" ry="5" fill="#d6577a"/>`
+    :`<path d="M53 92 Q60 99 67 92" stroke="#4a2f45" fill="none" stroke-width="2.6" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 120 160" aria-hidden="true">
+  ${ears}
+  <ellipse cx="60" cy="132" rx="32" ry="27" fill="${c.fur}" ${st}/>
+  <path d="M38 120 Q60 128 82 120 L87 154 H33Z" fill="#fff" stroke="#f4c5d9" stroke-width="2"/>
+  <path d="M60 148 C46 138 52 129 60 135 C68 129 74 138 60 148Z" fill="#ffb3d1"/>
+  <circle cx="29" cy="130" r="9" fill="${c.fur}" ${st}/>
+  <g class="arm-r"><circle cx="91" cy="126" r="9" fill="${c.fur}" ${st}/></g>
+  <circle cx="60" cy="78" r="38" fill="${c.fur}" ${st}/>
+  <g fill="#fff" stroke="#f0d3e0" stroke-width="2"><rect x="41" y="40" width="38" height="14" rx="4"/><circle cx="46" cy="34" r="10"/><circle cx="60" cy="27" r="12"/><circle cx="74" cy="34" r="10"/></g>
+  <rect x="42" y="42" width="36" height="8" fill="#fff"/>
+  ${eyes}
+  <circle cx="35" cy="91" r="6.5" fill="#ff9fbf" opacity=".6"/><circle cx="85" cy="91" r="6.5" fill="#ff9fbf" opacity=".6"/>
+  <ellipse cx="60" cy="87" rx="3.4" ry="2.4" fill="#e98aa8"/>
+  ${mouth}
+  </svg>`;
+}
+const Chars={
+  timer:null,
+  refresh(){const el=$('#char');if(el)el.innerHTML=charSVG(Settings.d.char);},
+  mood(m,ms=1300){
+    const el=$('#char');if(!el)return;el.innerHTML=charSVG(Settings.d.char,m);
+    clearTimeout(this.timer);this.timer=setTimeout(()=>this.refresh(),ms);
+  }
+};
+
+/* ลากได้ (ใช้กับตัวละคร / ขนม / ดาว) */
+function makeDraggable(el,{snap=false,onGrab}={}){
+  let sx,sy,ox=0,oy=0,tx=0,ty=0,on=false;
+  el.classList.add('draggable');
+  el.addEventListener('pointerdown',e=>{
+    on=true;sx=e.clientX;sy=e.clientY;el.setPointerCapture(e.pointerId);el.classList.add('grab');
+    el.style.transition='none';Sound.resume();Sound.play('pop');onGrab&&onGrab();e.preventDefault();
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!on)return;tx=ox+e.clientX-sx;ty=oy+e.clientY-sy;el.style.translate=`${tx}px ${ty}px`;
+  });
+  const end=()=>{
+    if(!on)return;on=false;el.classList.remove('grab');
+    if(snap){tx=ty=0;el.style.transition='translate .45s cubic-bezier(.3,1.7,.5,1)';el.style.translate='0 0';Sound.play('tap')}
+    ox=tx;oy=ty;
+  };
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+}
+
+/* =====================================================================
+   MODULE 4 · ICONS  (ภาพขนม 3 เมนู)
+   ===================================================================== */
+function cookieDraw(x,y,r,col,face,cool){
+  let s=`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="rgba(90,44,16,.25)" stroke-width="2"/>`;
+  s+=[[-.4,-.1],[.35,.25],[.1,-.45],[-.2,.45]].map(([a,b])=>`<circle cx="${x+a*r}" cy="${y+b*r}" r="${r*.1}" fill="rgba(90,44,16,.4)"/>`).join('');
+  if(face){
+    s+=`<path d="M${x-r*.7} ${y-r*.75} l${-r*.12} ${-r*.5} l${r*.45} ${r*.28}z M${x+r*.7} ${y-r*.75} l${r*.12} ${-r*.5} l${-r*.45} ${r*.28}z" fill="#b69cff" stroke="#8d70e6" stroke-width="1.2" stroke-linejoin="round"/>`;
+    s+=`<circle cx="${x-r*.33}" cy="${y-r*.05}" r="${r*.14}" fill="#3d2540"/><circle cx="${x+r*.33}" cy="${y-r*.05}" r="${r*.14}" fill="#3d2540"/>`;
+    s+=`<circle cx="${x-r*.29}" cy="${y-r*.1}" r="${r*.05}" fill="#fff"/><circle cx="${x+r*.37}" cy="${y-r*.1}" r="${r*.05}" fill="#fff"/>`;
+    s+=`<path d="M${x-r*.55} ${y-r*.33} L${x-r*.15} ${y-r*.22} M${x+r*.55} ${y-r*.33} L${x+r*.15} ${y-r*.22}" stroke="#3d2540" stroke-width="${Math.max(1.5,r*.1)}" stroke-linecap="round"/>`;
+    s+=`<path d="M${x-r*.3} ${y+r*.38} Q${x} ${y+r*.2} ${x+r*.3} ${y+r*.38}" stroke="#3d2540" stroke-width="${Math.max(1.5,r*.1)}" fill="none" stroke-linecap="round"/>`;
+    s+=`<circle cx="${x-r*.58}" cy="${y+r*.2}" r="${r*.12}" fill="#ff9fbf" opacity=".7"/><circle cx="${x+r*.58}" cy="${y+r*.2}" r="${r*.12}" fill="#ff9fbf" opacity=".7"/>`;
+  }
+  if(cool)s+=`<text x="${x+r*.7}" y="${y-r*.9}" font-size="${r*.8}">✨</text>`;
+  return s;
+}
+function iconSVG(id){
+  if(id==='custard')return `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="104" rx="54" ry="11" fill="#fff"/><ellipse cx="60" cy="102" rx="46" ry="8" fill="#ffe3ef"/><ellipse cx="60" cy="101" rx="38" ry="6" fill="#e9a043"/>
+  <g class="wob"><path d="M24 54 Q22 98 36 100 H84 Q98 98 96 54Z" fill="#ffe28a" stroke="#f0b94a" stroke-width="3" stroke-linejoin="round"/><path d="M32 62 Q31 80 36 92" stroke="#fff" stroke-width="4" opacity=".6" fill="none" stroke-linecap="round"/>
+  <path d="M20 52 Q22 30 60 28 Q98 30 100 52 Q100 66 92 64 Q89 78 82 64 Q76 72 70 62 Q62 70 55 62 Q48 76 42 62 Q34 70 30 64 Q20 66 20 52Z" fill="#d98a2b" stroke="#b8681a" stroke-width="3" stroke-linejoin="round"/><ellipse cx="42" cy="42" rx="12" ry="5" fill="#fff" opacity=".5" transform="rotate(-15 42 42)"/>
+  <circle cx="60" cy="28" r="9" fill="#fff" stroke="#f3cfe0" stroke-width="2"/><circle cx="60" cy="20" r="8" fill="#ff5f87"/><circle cx="57" cy="17" r="2.5" fill="#fff" opacity=".7"/><path d="M60 13 Q62 6 70 6" stroke="#4aa86c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M66 7 q6 -6 10 0 q-5 5 -10 0z" fill="#7fd69a"/>
+  <ellipse cx="46" cy="80" rx="4.5" ry="5.5" fill="#4a2f45"/><circle cx="47.8" cy="78" r="1.8" fill="#fff"/><ellipse cx="74" cy="80" rx="4.5" ry="5.5" fill="#4a2f45"/><circle cx="75.8" cy="78" r="1.8" fill="#fff"/>
+  <circle cx="36" cy="88" r="6" fill="#ff9fbf" opacity=".6"/><circle cx="84" cy="88" r="6" fill="#ff9fbf" opacity=".6"/><path d="M54 87 Q60 95 66 87" stroke="#4a2f45" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+  <text x="8" y="30" font-size="14">✨</text><text x="98" y="38" font-size="12">✨</text><text x="100" y="92" font-size="11">💖</text></svg>`;
+  if(id==='cupcake')return `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="110" rx="44" ry="7" fill="#fff" opacity=".8"/>
+  <g class="wob"><path d="M28 68 L92 68 L84 108 Q60 114 36 108Z" fill="#ffc2dc" stroke="#f08fb9" stroke-width="3" stroke-linejoin="round"/><path d="M42 70 L45 108 M60 70 V111 M78 70 L75 108" stroke="#fff" stroke-width="3.5" opacity=".7"/>
+  <path d="M24 68 Q22 52 40 50 Q60 42 80 50 Q98 52 96 68Z" fill="#f7d28a" stroke="#e5b25f" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M22 56 Q18 42 36 42 Q36 30 54 32 Q60 20 76 30 Q94 28 92 44 Q106 48 96 58 Q60 68 22 56Z" fill="#ffd1e4" stroke="#f3a8c9" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M34 46 Q46 38 58 40" stroke="#fff" stroke-width="4" opacity=".7" fill="none" stroke-linecap="round"/>
+  <circle cx="60" cy="20" r="8" fill="#ff5f87"/><circle cx="57" cy="17" r="2.5" fill="#fff" opacity=".7"/><path d="M60 13 Q62 6 70 6" stroke="#4aa86c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M66 7 q6 -6 10 0 q-5 5 -10 0z" fill="#7fd69a"/>
+  <g><rect x="34" y="48" width="9" height="3.4" rx="1.7" fill="#8fd7ff" transform="rotate(-30 38 50)"/><rect x="70" y="44" width="9" height="3.4" rx="1.7" fill="#ffd84d" transform="rotate(25 74 46)"/><rect x="52" y="50" width="9" height="3.4" rx="1.7" fill="#b9f0dc" transform="rotate(-10 56 52)"/><rect x="82" y="54" width="9" height="3.4" rx="1.7" fill="#c9b8ff" transform="rotate(-35 86 56)"/><rect x="44" y="36" width="9" height="3.4" rx="1.7" fill="#ff9fbf" transform="rotate(20 48 38)"/></g>
+  <ellipse cx="49" cy="88" rx="4.2" ry="5.2" fill="#4a2f45"/><circle cx="50.6" cy="86" r="1.7" fill="#fff"/><ellipse cx="71" cy="88" rx="4.2" ry="5.2" fill="#4a2f45"/><circle cx="72.6" cy="86" r="1.7" fill="#fff"/>
+  <circle cx="40" cy="95" r="5" fill="#ff7fa8" opacity=".6"/><circle cx="80" cy="95" r="5" fill="#ff7fa8" opacity=".6"/><path d="M55 94 Q60 101 65 94" stroke="#4a2f45" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+  <text x="8" y="34" font-size="14">✨</text><text x="98" y="30" font-size="12">💖</text><text x="100" y="90" font-size="11">✨</text></svg>`;
+  return `<svg viewBox="0 0 120 120">${cookieDraw(60,66,42,'#e8b27a',true,false).replace(/<text.*?<\/text>/,'')}</svg>`;
+}
+
+/* =====================================================================
+   MODULE 5 · RECIPES  (ข้อมูลเมนู / ขั้นตอน / ความยาก)
+   t = ชนิดการเล่น: drag | stir | swipe | tap | timing
+   ===================================================================== */
+const DECOYS=[{e:'🌶️',n:'พริก'},{e:'🧅',n:'หัวหอม'},{e:'🍋',n:'มะนาว'},{e:'🥦',n:'บรอกโคลี'},{e:'🧄',n:'กระเทียม'}];
+const PAL={ramekin:['#ffe9a8','#f4c264','#8a4b1e'],cupcake:['#fff1c9','#f2c37a','#7a3f1c'],cookie:['#f6e2b8','#e8a95a','#6b3414']};
+const bakeColor=(k,b)=>{const p=PAL[k];return b<.65?mix(p[0],p[1],b/.65):mix(p[1],p[2],(b-.65)/.35)};
+const CARA=['#f4efe6','#e8a33d','#5e2d0c'];
+
+const RECIPES={
+custard:{id:'custard',name:'คาราเมลคัสตาร์ด',sub:'สูตรอบเนื้อเนียนนุ่ม',stars:1,color:'#ffd6e8',items:'ramekin',
+ book:[{h:'ส่วนคาราเมล',l:['น้ำตาลทราย 140 กรัม','น้ำเปล่า 90 กรัม','น้ำร้อนจัด 1 ช้อนโต๊ะ']},{h:'ส่วนคัสตาร์ด',l:['ไข่ไก่ 4 ฟอง','นมจืด 400 กรัม','นมข้นจืด 200 กรัม','น้ำตาลทราย 75 กรัม','กลิ่นวานิลลา 1 ช้อนชา']},{h:'อบ',l:['วางถ้วยในถาดรองน้ำร้อน (water bath) สูงครึ่งถ้วย','อบที่ 160–200°C ประมาณ 25–30 นาที','พักให้เย็นแล้วแช่ตู้เย็นก่อนเสิร์ฟ']}],
+ steps:[
+ {t:'drag',title:'ทำคาราเมล',say:'เริ่มจากคาราเมลหอมหวานกันก่อนนะ! ใส่น้ำตาลทราย 140 กรัม กับน้ำเปล่า 90 กรัมลงหม้อเลย~ 🍬',tip:'น้ำตาลทราย 140 กรัม + น้ำเปล่า 90 กรัม',set:{scene:'pot',fill:0,liquid:'#f6f1e6'},items:[{e:'🍬',n:'น้ำตาลทราย',amt:'140 กรัม',c:'#fbf7ee'},{e:'💧',n:'น้ำเปล่า',amt:'90 กรัม',c:'#e6f4ff'}],fillEach:.17},
+ {t:'timing',title:'เคี่ยวคาราเมล',say:'ตั้งไฟอ่อน ๆ ไม่ต้องคนนะ รอจนน้ำตาลเป็นสีน้ำตาลทองสวย ๆ แล้วกด "ปิดไฟ" ให้ทัน! 🔥',tip:'ตั้งไฟอ่อน ไม่ต้องคน จนเป็นสีน้ำตาลทอง',timing:{speed:.07,zone:[.58,.74],label:'🔥 ปิดไฟ!',colors:CARA,mid:.66,liquid:true,sizzle:true}},
+ {t:'drag',title:'ใส่น้ำร้อน',say:'ปิดไฟแล้ว! ค่อย ๆ ใส่น้ำร้อนจัด 1 ช้อนโต๊ะ ระวังคาราเมลกระเด็นนะ 💦',tip:'ระวังคาราเมลกระเด็น แล้วคนให้เข้ากัน',items:[{e:'♨️',n:'น้ำร้อนจัด',amt:'1 ช้อนโต๊ะ',c:'#d98a2b'}],fillEach:.05},
+ {t:'tap',title:'เทคาราเมลลงถ้วย',say:'เทคาราเมลลงก้นถ้วยทีละใบเลย แล้วพักไว้ให้เซ็ตตัวประมาณ 5 นาที 🍯',tip:'เทลงก้นถ้วยพิมพ์เล็กน้อย พักให้เซ็ต 5 นาที',set:{scene:'cups',cupsN:3,items:'ramekin',bake:0,water:false,baked:false},tap:{n:3,flag:'caramel'}},
+ {t:'drag',title:'อุ่นนม',say:'ต่อไปเป็นเนื้อคัสตาร์ดนุ่ม ๆ! เทนมจืด 400 กรัม กับนมข้นจืด 200 กรัมลงหม้อเลย 🥛',tip:'นมจืด 400 กรัม + นมข้นจืด 200 กรัม',set:{scene:'pot',fill:0,liquid:'#fffaf0'},items:[{e:'🥛',n:'นมจืด',amt:'400 กรัม',c:'#fffaf0'},{e:'🍼',n:'นมข้นจืด',amt:'200 กรัม',c:'#fff4dc'}],fillEach:.25},
+ {t:'timing',title:'อุ่นให้พออุ่น',say:'ตั้งไฟอ่อนพออุ่น ๆ ไม่ต้องให้เดือดจัดนะ แล้วรีบยกลง!',tip:'ตั้งไฟอ่อนพออุ่น ไม่ต้องเดือดจัด',timing:{speed:.09,zone:[.4,.58],label:'🥛 ยกลง!',warm:true}},
+ {t:'drag',title:'เตรียมไข่',say:'ตอกไข่ไก่ 4 ฟอง ใส่น้ำตาลทราย 75 กรัม และกลิ่นวานิลลา 1 ช้อนชาลงชามเลย 🥚',tip:'ไข่ 4 ฟอง + น้ำตาล 75 กรัม + วานิลลา 1 ช้อนชา',set:{scene:'bowl',fill:0,liquid:'#ffffff',heat:false,boil:false},items:[{e:'🥚',n:'ไข่ไก่',amt:'4 ฟอง',c:'#ffe58f'},{e:'🍬',n:'น้ำตาลทราย',amt:'75 กรัม',c:'#fbf0d0'},{e:'🌼',n:'กลิ่นวานิลลา',amt:'1 ช้อนชา',c:'#f3dca0'}],fillEach:.14},
+ {t:'stir',title:'ตีไข่เบา ๆ',say:'ตีเบา ๆ นะ ระวังอย่าให้เกิดฟองอากาศมากเกินไป วนช้า ๆ น้า~ 🌀',tip:'ตีเบา ๆ อย่าให้มีฟองอากาศมาก',stir:{rev:5,gentle:true,to:'#ffe9a8'}},
+ {t:'stir',title:'เทนมอุ่น',say:'ค่อย ๆ เทนมอุ่นลงไปทีละนิด พร้อมคนเร็ว ๆ ไม่ให้ไข่สุกเป็นลิ่มนะ!',tip:'เทนมอุ่นทีละนิด คนเร็ว ๆ',stir:{rev:6,gentle:false,to:'#fff1b8',fillTo:.8}},
+ {t:'swipe',title:'กรองให้เนียน',say:'กรองผ่านกระชอน 1-2 รอบ ให้เนื้อเนียนละเอียดเหมือนกำมะหยี่~ ลากซ้าย-ขวาเลย ✨',tip:'กรองผ่านกระชอน 1–2 ครั้ง',swipe:{n:4,dust:'#ffe9a8'}},
+ {t:'tap',title:'เทคัสตาร์ด',say:'เทคัสตาร์ดลงในถ้วยที่มีคาราเมลรองก้นไว้ทีละใบนะ 🍮',tip:'เทลงถ้วยที่มีคาราเมลรองก้น',set:{scene:'cups',sieve:false,dust:false},tap:{n:3,flag:'batter'}},
+ {t:'tap',title:'ปิดฟอยล์',say:'ปิดฟอยล์หน้าถ้วย กันหน้าคัสตาร์ดแห้งหรือไหม้ แตะที่ถ้วยเลย ✨',tip:'ใช้ฟอยล์ปิดหน้าถ้วยแต่ละใบ',tap:{n:3,flag:'foil'}},
+ {t:'drag',title:'รองน้ำร้อน',say:'วางถ้วยลงในถาดอบ แล้วเทน้ำร้อนลงถาดให้สูงประมาณครึ่งถ้วย (water bath) 🛁',tip:'น้ำร้อนในถาดสูงประมาณครึ่งหนึ่งของถ้วย',items:[{e:'♨️',n:'น้ำร้อน',amt:'สูงครึ่งถ้วย',c:'#bfe3ff'}],fillEach:0,done:{water:true}},
+ {t:'tap',title:'อุ่นเตาอบ',say:'หมุนปุ่มตั้งอุณหภูมิเตาอบนะ 180°C กำลังดีเลย! 🔥',tip:'อบที่อุณหภูมิประมาณ 160–200°C',set:{scene:'oven',dial:0,hot:false,temp:'25°C'},tap:{n:3,dial:true,temp:180}},
+ {t:'timing',title:'อบคัสตาร์ด',say:'อบประมาณ 25-30 นาทีจนสุก เห็นสีทองสวยแล้วกดเอาออกเลย! ลองจิ้มไม้จิ้มฟัน ถ้าไม่มีเนื้อเหลวติดคือสุกแล้ว 🍮',tip:'25–30 นาที จนสุก (ไม้จิ้มฟันไม่มีเนื้อเหลวติด)',timing:{speed:.07,zone:[.56,.72],label:'🍮 เอาออกจากเตา!',bake:true}},
+ {t:'tap',title:'แช่ตู้เย็น',say:'พักให้เย็น แล้วแช่ตู้เย็นก่อนเสิร์ฟ แตะที่ตู้เย็นเพื่อเปิด-ปิดประตูนะ ❄️',tip:'พักให้เย็นแล้วแช่ตู้เย็นก่อนเสิร์ฟ',set:{scene:'fridge',door:0,hot:false},tap:{n:2,door:true}}
+ ]},
+cupcake:{id:'cupcake',name:'คัพเค้กวานิลลา',sub:'ฟูนุ่ม แต่งหน้าสวย',stars:2,color:'#d6f5ea',items:'cupcake',
+ book:[{h:'ส่วนผสม',l:['แป้งเค้ก 75 กรัม','ผงฟู 1/2 ช้อนชา','ไข่ไก่ (เบอร์ 2) 3 ฟอง','น้ำตาลทราย 75 กรัม','เกลือป่น 1/4 ช้อนชา','น้ำเปล่า 38 กรัม','กลิ่นวานิลลา 1 ช้อนชา','เนยละลายหรือน้ำมันพืช 30 กรัม']},{h:'อบ',l:['อุ่นเตาอบ 175°C','อบประมาณ 20–25 นาที','เทใส่ถ้วยประมาณ 3/4 ของถ้วย','พักให้เย็นบนตะแกรง แต่งด้วยบัตเตอร์ครีมหรือวิปครีม']}],
+ steps:[
+ {t:'tap',title:'เตรียมพิมพ์',say:'วางถ้วยกระดาษลงในพิมพ์คัพเค้กก่อนนะ แตะที่ถ้วยเลย 🧁',tip:'ใส่ถ้วยกระดาษลงในพิมพ์คัพเค้ก',set:{scene:'cups',cupsN:4,items:'cupcake',bake:0,water:false,baked:false,hot:false},tap:{n:4,flag:'liner'}},
+ {t:'tap',title:'อุ่นเตาอบ',say:'หมุนปุ่มเตาอบไปที่ 175°C แล้วรอไว้ก่อนเลย!',tip:'อุ่นเตาอบที่ 175°C',set:{scene:'oven',dial:0,hot:false,temp:'25°C'},tap:{n:3,dial:true,temp:175}},
+ {t:'drag',title:'เตรียมแป้ง',say:'ใส่แป้งเค้ก 75 กรัม กับผงฟู 1/2 ช้อนชา ลงในกระชอนเลย 🌾',tip:'แป้งเค้ก 75 กรัม + ผงฟู 1/2 ช้อนชา',set:{scene:'bowl',fill:0,liquid:'#ffffff'},items:[{e:'🌾',n:'แป้งเค้ก',amt:'75 กรัม',c:'#fffaf2'},{e:'✨',n:'ผงฟู',amt:'1/2 ช้อนชา',c:'#ffffff'}],fillEach:.12},
+ {t:'swipe',title:'ร่อนแป้ง',say:'ร่อนแป้งกับผงฟูเข้าด้วยกัน ให้ฟูเบา ๆ แล้วพักไว้~ ลากซ้าย-ขวาเลย ☁️',tip:'ร่อนแป้งเค้กและผงฟูเข้าด้วยกัน พักไว้',swipe:{n:4,dust:'#fffaf2'}},
+ {t:'drag',title:'เตรียมส่วนผสมไข่',say:'ตอกไข่ 3 ฟอง ใส่น้ำตาล เกลือ น้ำเปล่า และวานิลลาลงชามใหม่เลย~ 🥚',tip:'ไข่ 3 ฟอง · น้ำตาล 75 ก. · เกลือ 1/4 ชช. · น้ำ 38 ก. · วานิลลา 1 ชช.',set:{scene:'bowl',fill:0,liquid:'#ffffff',sieve:false,dust:false},items:[{e:'🥚',n:'ไข่ไก่',amt:'3 ฟอง',c:'#ffe58f'},{e:'🍬',n:'น้ำตาลทราย',amt:'75 กรัม',c:'#fbf0d0'},{e:'🧂',n:'เกลือป่น',amt:'1/4 ช้อนชา',c:'#ffffff'},{e:'💧',n:'น้ำเปล่า',amt:'38 กรัม',c:'#e6f4ff'},{e:'🌼',n:'กลิ่นวานิลลา',amt:'1 ช้อนชา',c:'#f3dca0'}],fillEach:.1},
+ {t:'stir',title:'ตีให้ขึ้นฟู',say:'ใช้เครื่องตีไฟฟ้าตีด้วยความเร็วสูง จนขึ้นฟูขาวเนียน! วนเร็ว ๆ เลย 🌀',tip:'ตีด้วยความเร็วสูงจนขึ้นฟูขาวเนียน',stir:{rev:9,gentle:false,to:'#fff6dc',fillTo:.85}},
+ {t:'drag',title:'ใส่แป้งและเนย',say:'ค่อย ๆ ใส่แป้งที่ร่อนไว้ แล้วทยอยใส่เนยละลาย 30 กรัมลงไปนะ 🧈',tip:'เนยละลายหรือน้ำมันพืช 30 กรัม',items:[{e:'🌾',n:'แป้งที่ร่อนไว้',amt:'',c:'#fffaf2'},{e:'🧈',n:'เนยละลาย',amt:'30 กรัม',c:'#ffe9a0'}],fillEach:.04},
+ {t:'stir',title:'ตะล่อมเบา ๆ',say:'ใช้พายตะล่อมเบา ๆ ให้เข้ากันจนไม่เห็นเม็ดแป้ง แล้วผสมให้เนียนนะ~',tip:'ตะล่อมเบา ๆ จนไม่เห็นเม็ดแป้ง',stir:{rev:4,gentle:true,to:'#fff1c9'}},
+ {t:'tap',title:'หยอดลงพิมพ์',say:'ตักส่วนผสมใส่ถ้วยกระดาษประมาณ 3/4 ของถ้วยนะ แตะทีละใบเลย 🥄',tip:'เทลงถ้วยประมาณ 3/4',set:{scene:'cups'},tap:{n:4,flag:'batter'}},
+ {t:'timing',title:'อบคัพเค้ก',say:'เข้าเตาอบ 175°C ประมาณ 20-25 นาที ดูให้ขึ้นฟูสีทองแล้วกดเอาออก! 🧁',tip:'175°C ประมาณ 20–25 นาที',set:{scene:'oven'},timing:{speed:.09,zone:[.58,.74],label:'🧁 เอาออกจากเตา!',bake:true}},
+ {t:'tap',title:'แต่งหน้า',say:'พักให้เย็นบนตะแกรง แล้วแต่งหน้าด้วยวิปครีมสีพาสเทลเลย 🍓',tip:'แต่งหน้าด้วยบัตเตอร์ครีมหรือวิปครีม',set:{scene:'cups',hot:false},tap:{n:4,flag:'frost'}}
+ ]},
+cookie:{id:'cookie',name:'คุกกี้ตัวร้าย',sub:'หน้าตาดุ แต่ใจดีมาก 😈',stars:3,color:'#e6dcff',items:'cookie',
+ book:[{h:'ส่วนผสม (ประมาณ 40 ชิ้น)',l:['เนยเค็ม 150 กรัม (นิ่มที่อุณหภูมิห้อง)','น้ำตาลไอซิ่ง 80 กรัม','ไข่ไก่ (เบอร์ 2) 1 ฟอง','แป้งสาลีอเนกประสงค์ 150 กรัม','แป้งข้าวโพด 30 กรัม','นมผง 10 กรัม (ใส่หรือไม่ก็ได้)','กลิ่นวานิลลา 1 ช้อนชา']},{h:'อบ',l:['วอร์มเตาอบ 160°C (ไฟบน-ล่าง)','อบประมาณ 15 นาที จนขอบเริ่มเหลืองทอง','พักบนตะแกรงจนเย็น เก็บในภาชนะปิดสนิท']}],
+ steps:[
+ {t:'drag',title:'เนยกับน้ำตาล',say:'เริ่มจากเนยเค็ม 150 กรัมที่นิ่มแล้ว กับน้ำตาลไอซิ่ง 80 กรัมลงชามเลย~ 🧈',tip:'เนยเค็มนิ่มที่อุณหภูมิห้อง + น้ำตาลไอซิ่ง',set:{scene:'bowl',fill:0,liquid:'#ffffff',items:'cookie',bake:0,water:false,baked:false,hot:false},items:[{e:'🧈',n:'เนยเค็ม',amt:'150 กรัม',c:'#fff0a8'},{e:'☁️',n:'น้ำตาลไอซิ่ง',amt:'80 กรัม',c:'#ffffff'}],fillEach:.2},
+ {t:'stir',title:'ตีเนยให้ฟู',say:'ตีเนยกับน้ำตาลจนเนียนนุ่มขึ้นฟู! วนเร็ว ๆ เลย ตัวร้ายชอบเนยฟู ๆ นะ 😈',tip:'ตีเนย 3–4 นาที ใส่น้ำตาลไอซิ่งแล้วตีต่ออีก 2 นาที',stir:{rev:10,gentle:false,to:'#fff7d1',fillTo:.6}},
+ {t:'drag',title:'ใส่ไข่',say:'ใส่ไข่ไก่ 1 ฟอง กับกลิ่นวานิลลา 1 ช้อนชา แล้วตีให้เข้ากัน 🥚',tip:'ไข่ไก่ 1 ฟอง + วานิลลา 1 ช้อนชา',items:[{e:'🥚',n:'ไข่ไก่',amt:'1 ฟอง',c:'#ffe58f'},{e:'🌼',n:'กลิ่นวานิลลา',amt:'1 ช้อนชา',c:'#f3dca0'}],fillEach:.07},
+ {t:'drag',title:'เตรียมแป้ง',say:'ใส่แป้งสาลี 150 กรัม แป้งข้าวโพด 30 กรัม และนมผง 10 กรัมลงกระชอน 🌾',tip:'แป้งสาลีอเนกประสงค์ + แป้งข้าวโพด + นมผง',items:[{e:'🌾',n:'แป้งสาลีอเนกประสงค์',amt:'150 กรัม',c:'#fffaf2'},{e:'🌽',n:'แป้งข้าวโพด',amt:'30 กรัม',c:'#fff6d0'},{e:'🥛',n:'นมผง',amt:'10 กรัม',c:'#fffdf5'}],fillEach:.05},
+ {t:'swipe',title:'ร่อนแป้ง',say:'ร่อนแป้งลงในส่วนผสมเนย แบ่งใส่ 2-3 ครั้งนะ ลากซ้าย-ขวา~ ☁️',tip:'ร่อนแป้ง แบ่งใส่ 2–3 ครั้ง',swipe:{n:6,dust:'#fffaf0'}},
+ {t:'stir',title:'ตะล่อมเบา ๆ',say:'ใช้พายยางตะล่อมเบา ๆ พอเข้ากัน อย่าคนนานนะ ไม่งั้นคุกกี้จะเหนียวและแข็ง! 😱',tip:'ไม่ควรคนนานเกินไป คุกกี้จะเหนียวและแข็ง',stir:{rev:3,gentle:true,limit:1.5,to:'#fff1c9'}},
+ {t:'tap',title:'บีบขึ้นรูป',say:'บีบแป้งลงถาดรองกระดาษไข ทีละชิ้นเลย ตัวร้ายตัวน้อยกำลังจะเกิด~ 😈',tip:'บีบด้วยหัวแฉก หรือปั้นกลมแล้วกดด้วยส้อม',set:{scene:'cups',cupsN:6,items:'cookie',sieve:false,dust:false},tap:{n:6,flag:'pipe'}},
+ {t:'tap',title:'อุ่นเตาอบ',say:'หมุนปุ่มเตาอบไปที่ 160°C (ไฟบน-ล่าง) นะ!',tip:'วอร์มเตา 160°C ไฟบน-ล่าง',set:{scene:'oven',dial:0,hot:false,temp:'25°C'},tap:{n:2,dial:true,temp:160}},
+ {t:'timing',title:'อบคุกกี้',say:'อบประมาณ 15 นาที ขอบเริ่มเหลืองทองต้องรีบเอาออก! ช่วงเวลาสั้นมาก ระวังไหม้นะ 🔥',tip:'160°C ประมาณ 15 นาที จนขอบเหลืองทอง',timing:{speed:.12,zone:[.6,.7],label:'🍪 เอาออกจากเตา!',bake:true}},
+ {t:'tap',title:'พักให้เย็น',say:'พักบนตะแกรงจนเย็นสนิท แตะเพื่อเก็บใส่ภาชนะปิดฝา คุกกี้จะได้กรอบนาน ๆ~ ✨',tip:'เก็บใส่ภาชนะปิดสนิทเพื่อรักษาความกรอบ',set:{scene:'cups',hot:false},tap:{n:6,flag:'cool'}}
+ ]}
+};
+
+/* =====================================================================
+   MODULE 6 · STAGE RENDERERS  (วาดหม้อ ชาม ถ้วย เตาอบ ตู้เย็น)
+   ===================================================================== */
+function miniItems(S){
+  const k=S.items,col=bakeColor(k,S.bake);let s='';
+  if(k==='ramekin')[110,160,210].forEach(x=>s+=`<path d="M${x-16} 160 L${x+16} 160 L${x+12} 186 L${x-12} 186Z" fill="#fff" stroke="#f4a6c6" stroke-width="2"/><rect x="${x-12}" y="164" width="24" height="10" fill="${col}"/><rect x="${x-11}" y="176" width="22" height="9" fill="#d98a2b"/>`);
+  else if(k==='cupcake')[100,140,180,220].forEach(x=>{const h=10+14*clamp(S.bake*1.5,0,1);s+=`<path d="M${x-14} 168 L${x+14} 168 L${x+10} 186 L${x-10} 186Z" fill="#ffc2dc"/><path d="M${x-14} 168 Q${x} ${168-h*2} ${x+14} 168Z" fill="${col}"/>`});
+  else [[110,150],[160,150],[210,150],[110,176],[160,176],[210,176]].forEach(([x,y])=>s+=cookieDraw(x,y,12,col,false,false));
+  return s;
+}
+function potSVG(S){
+  const lvl=S.fill*84,liq=S.liquid;let fl='',bub='',st='';
+  if(S.heat){fl=[104,138,172,206].map((x,i)=>`<path class="flame" style="animation-delay:${i*.1}s" d="M${x+10} 212 C${x+1} 218 ${x+2} 228 ${x+10} 228 C${x+18} 228 ${x+19} 218 ${x+10} 212Z" fill="${i%2?'#ffd36e':'#ff9a8b'}"/>`).join('');
+    st=[130,160,190].map((x,i)=>`<path class="steam" style="animation-delay:${i*.5}s" d="M${x} 100 q-8 -12 0 -22 q8 -10 0 -20" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>`).join('');}
+  if((S.heat||S.boil)&&S.fill>0)bub=[100,130,160,190,215].map((x,i)=>`<circle class="bub" style="animation-delay:${i*.23}s" cx="${x}" cy="${200-lvl*.4}" r="${4+i%3*2}" fill="#fff" opacity=".7"/>`).join('');
+  return `<defs><clipPath id="pc"><path d="M70 118 H250 V188 Q250 208 230 208 H90 Q70 208 70 188Z"/></clipPath></defs>
+  <rect x="40" y="226" width="240" height="28" rx="14" fill="#ffc9de" stroke="#f4a6c6" stroke-width="3"/><circle cx="80" cy="240" r="6" fill="#fff"/><circle cx="160" cy="240" r="6" fill="#fff"/><circle cx="240" cy="240" r="6" fill="#fff"/>
+  ${fl}
+  <rect x="34" y="132" width="32" height="12" rx="6" fill="#ffb3d1"/><rect x="254" y="132" width="32" height="12" rx="6" fill="#ffb3d1"/>
+  <path d="M64 112 H256 V190 Q256 214 232 214 H88 Q64 214 64 190Z" fill="#d9d2ff" stroke="#b5a8f2" stroke-width="3"/>
+  <path d="M70 118 H250 V188 Q250 208 230 208 H90 Q70 208 70 188Z" fill="#efeaff"/>
+  <g clip-path="url(#pc)"><rect x="60" y="${208-lvl}" width="200" height="${lvl+10}" fill="${liq}"/><ellipse cx="160" cy="${208-lvl}" rx="92" ry="6" fill="#fff" opacity=".28"/>${bub}</g>
+  <rect x="58" y="106" width="204" height="14" rx="7" fill="#c8bdff"/><rect x="80" y="140" width="9" height="46" rx="4" fill="#fff" opacity=".4"/>
+  ${st}`;
+}
+function bowlSVG(S){
+  const lvl=S.fill*88,y=206-lvl,liq=S.liquid;let sp='',sv='';
+  if(S.spoonOn){const a=S.spoon,tx=160+46*Math.cos(a),ty=170+12*Math.sin(a);
+    sp=`<line x1="${tx}" y1="${ty}" x2="${tx+36}" y2="${ty-96}" stroke="#f4b58a" stroke-width="10" stroke-linecap="round"/><ellipse cx="${tx}" cy="${ty}" rx="13" ry="8" fill="#f4b58a" stroke="#d98f60" stroke-width="2"/>`;}
+  if(S.sieve){const x=S.sieveX||0;
+    sv=`<g transform="translate(${x} 0)"><path d="M100 66 H220 Q220 106 160 112 Q100 106 100 66Z" fill="#f6f4ff" stroke="#bfb8e8" stroke-width="3"/><path d="M112 78 H208 M118 92 H202 M130 66 V106 M160 66 V112 M190 66 V106" stroke="#d9d3f5" stroke-width="2"/><rect x="216" y="60" width="64" height="10" rx="5" transform="rotate(-10 216 65)" fill="#ffb3d1"/>
+    ${S.dust?[125,145,165,185].map((p,i)=>`<circle class="dust" style="animation-delay:${i*.13}s" cx="${p}" cy="112" r="4" fill="${S.dustColor||'#fffaf0'}"/>`).join(''):''}</g>`;}
+  return `<defs><clipPath id="bc"><path d="M72 124 H248 Q248 204 160 206 Q72 204 72 124Z"/></clipPath></defs>
+  <ellipse cx="160" cy="236" rx="100" ry="12" fill="#ffc9de"/>
+  <path d="M60 120 H260 Q260 218 160 220 Q60 218 60 120Z" fill="#c9f2e3" stroke="#9fdcc5" stroke-width="3"/>
+  <path d="M68 172 Q160 190 252 172" stroke="#fff" stroke-width="7" opacity=".6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="160" cy="121" rx="100" ry="13" fill="#a8e6d0"/><ellipse cx="160" cy="123" rx="92" ry="9" fill="#e9fbf4"/>
+  <g clip-path="url(#bc)"><rect x="60" y="${y}" width="200" height="${lvl+16}" fill="${liq}"/><ellipse cx="160" cy="${y}" rx="90" ry="8" fill="#fff" opacity=".3"/></g>
+  ${sp}${sv}`;
+}
+function cupsSVG(S){
+  const k=S.items,n=S.cups.length;let s='';
+  if(k==='cookie'){
+    s+=`<rect x="26" y="70" width="268" height="170" rx="22" fill="#e6e1f5" stroke="#c9c1ea" stroke-width="4"/><rect x="40" y="84" width="240" height="142" rx="14" fill="#fff" opacity=".7"/>`;
+    S.cups.forEach((c,i)=>{const x=82+(i%3)*78,y=124+((i/3)|0)*72;
+      s+=`<g class="tapT" data-i="${i}"><g>${c.pipe?cookieDraw(x,y,28,bakeColor('cookie',S.bake),S.baked,c.cool):`<circle cx="${x}" cy="${y}" r="28" fill="#fff" fill-opacity=".01" stroke="#cfc7ee" stroke-width="3" stroke-dasharray="6 6"/>`}</g></g>`;});
+    return s;
+  }
+  const xs=n===3?[60,160,260]:[50,125,200,275],w=n===3?84:66;
+  if(S.water)s+=`<rect x="14" y="156" width="292" height="40" rx="12" fill="#bfe3ff" opacity=".85"/><path d="M20 160 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" stroke="#fff" stroke-width="3" fill="none" opacity=".7"/>`;
+  s+=`<rect x="14" y="188" width="292" height="16" rx="8" fill="#e6e1f5" stroke="#c9c1ea" stroke-width="3"/>`;
+  S.cups.forEach((c,i)=>{const x=xs[i];s+=`<g class="tapT" data-i="${i}"><g><rect x="${x-w/2-4}" y="96" width="${w+8}" height="100" fill="#fff" fill-opacity=".01"/>`;
+    if(k==='ramekin'){
+      s+=`<defs><clipPath id="rc${i}"><path d="M${x-w/2+4} 124 L${x+w/2-4} 124 L${x+w*.39-3} 188 L${x-w*.39+3} 188Z"/></clipPath></defs>
+      <path d="M${x-w/2} 120 L${x+w/2} 120 L${x+w*.39} 190 L${x-w*.39} 190Z" fill="#fff" stroke="#f4a6c6" stroke-width="3" stroke-linejoin="round"/>
+      <g clip-path="url(#rc${i})">${c.caramel?`<rect x="${x-w/2}" y="170" width="${w}" height="22" fill="#d98a2b"/>`:''}${c.batter?`<rect x="${x-w/2}" y="134" width="${w}" height="38" fill="${bakeColor('ramekin',S.bake)}"/>`:''}</g>
+      <path d="M${x-w/2+2} 124 H${x+w/2-2}" stroke="#ffb3d1" stroke-width="6" stroke-linecap="round"/><ellipse cx="${x-w*.15}" cy="152" rx="3.6" ry="4.6" fill="#4a2f45"/><circle cx="${x-w*.15+1.4}" cy="150.2" r="1.4" fill="#fff"/><ellipse cx="${x+w*.15}" cy="152" rx="3.6" ry="4.6" fill="#4a2f45"/><circle cx="${x+w*.15+1.4}" cy="150.2" r="1.4" fill="#fff"/><circle cx="${x-w*.27}" cy="160" r="5" fill="#ff9fbf" opacity=".65"/><circle cx="${x+w*.27}" cy="160" r="5" fill="#ff9fbf" opacity=".65"/><path d="M${x-5} 159 Q${x} 165 ${x+5} 159" stroke="#4a2f45" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      ${c.foil?`<path d="M${x-w/2-5} 122 Q${x} 98 ${x+w/2+5} 122Z" fill="#e3e8f2" stroke="#b5bfd6" stroke-width="3" stroke-linejoin="round"/><path d="M${x-12} 112 Q${x} 104 ${x+8} 108" stroke="#fff" stroke-width="3" fill="none"/>`:''}`;
+    }else{
+      const h=12+22*clamp(S.bake*1.5,0,1),top=130-h;
+      s+=c.liner?`<path d="M${x-w/2} 130 L${x+w/2} 130 L${x+w*.38} 190 L${x-w*.38} 190Z" fill="#ffc2dc" stroke="#f08fb9" stroke-width="3" stroke-linejoin="round"/><path d="M${x-w*.2} 134 L${x-w*.15} 188 M${x} 134 V188 M${x+w*.2} 134 L${x+w*.15} 188" stroke="#fff" stroke-width="3" opacity=".6"/>`
+        :`<path d="M${x-w/2} 130 L${x+w/2} 130 L${x+w*.38} 190 L${x-w*.38} 190Z" fill="none" stroke="#cfc7ee" stroke-width="3" stroke-dasharray="6 6"/>`;
+      if(c.liner&&c.batter)s+=`<path d="M${x-w/2+2} 130 Q${x} ${top-8} ${x+w/2-2} 130Z" fill="${bakeColor('cupcake',S.bake)}" stroke="rgba(90,44,16,.2)" stroke-width="2"/>`;
+      if(c.liner)s+=`<ellipse cx="${x-w*.14}" cy="160" rx="3.3" ry="4.3" fill="#4a2f45"/><circle cx="${x-w*.14+1.2}" cy="158.4" r="1.3" fill="#fff"/><ellipse cx="${x+w*.14}" cy="160" rx="3.3" ry="4.3" fill="#4a2f45"/><circle cx="${x+w*.14+1.2}" cy="158.4" r="1.3" fill="#fff"/><circle cx="${x-w*.25}" cy="168" r="4.5" fill="#ff7fa8" opacity=".6"/><circle cx="${x+w*.25}" cy="168" r="4.5" fill="#ff7fa8" opacity=".6"/><path d="M${x-4.5} 167 Q${x} 172.5 ${x+4.5} 167" stroke="#4a2f45" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+      if(c.frost)s+=`<ellipse cx="${x}" cy="${top-2}" rx="${w*.4}" ry="8" fill="#fff" stroke="#f3cfe0" stroke-width="2"/><ellipse cx="${x}" cy="${top-11}" rx="${w*.3}" ry="8" fill="#ffd1e4" stroke="#f3a8c9" stroke-width="2"/><ellipse cx="${x}" cy="${top-19}" rx="${w*.18}" ry="6" fill="#fff" stroke="#f3cfe0" stroke-width="2"/><circle cx="${x}" cy="${top-28}" r="6" fill="#ff5f87"/><circle cx="${x-2}" cy="${top-30}" r="1.8" fill="#fff" opacity=".7"/><rect x="${x-w*.26}" y="${top-5}" width="6" height="2.6" rx="1.3" fill="#8fd7ff" transform="rotate(-25 ${x-w*.26} ${top-5})"/><rect x="${x+w*.16}" y="${top-6}" width="6" height="2.6" rx="1.3" fill="#ffd84d" transform="rotate(25 ${x+w*.16} ${top-6})"/><rect x="${x-5}" y="${top-14}" width="6" height="2.6" rx="1.3" fill="#b9f0dc"/><rect x="${x+w*.1}" y="${top-14}" width="6" height="2.6" rx="1.3" fill="#c9b8ff" transform="rotate(30 ${x+w*.1} ${top-14})"/>`;
+    }
+    s+=`</g></g>`;});
+  return s;
+}
+function ovenSVG(S){
+  const glow=S.hot||S.heat;
+  return `<defs><radialGradient id="glow" cx="50%" cy="70%" r="70%"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff9a6b"/></radialGradient></defs>
+  <rect x="50" y="34" width="220" height="208" rx="32" fill="#ffd6e8" stroke="#f4a6c6" stroke-width="4"/>
+  <rect x="50" y="34" width="220" height="50" rx="26" fill="#ffc2dc"/>
+  <rect x="80" y="48" width="108" height="24" rx="10" fill="#6a4566"/><text x="134" y="66" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="17" fill="${glow?'#ffd36e':'#c9b7d6'}">${S.temp||'25°C'}</text>
+  <circle cx="206" cy="60" r="4" fill="#fff"/>
+  <g class="tapT" data-i="0"><g transform="rotate(${(S.dial||0)*70} 240 60)"><circle cx="240" cy="60" r="15" fill="#fff" stroke="#e8a3c1" stroke-width="3"/><rect x="238" y="47" width="4" height="13" rx="2" fill="#ff6f91"/></g></g>
+  <rect x="72" y="98" width="176" height="118" rx="20" fill="#5a3b57" stroke="#fff" stroke-width="5"/>
+  <rect x="80" y="106" width="160" height="102" rx="14" fill="${glow?'url(#glow)':'#755070'}"/>
+  <rect x="86" y="188" width="148" height="6" rx="3" fill="#d9d2ff"/>${miniItems(S)}
+  <rect x="100" y="222" width="120" height="10" rx="5" fill="#fff"/>
+  ${S.heat?`<text x="92" y="122" font-size="14">✨</text><text x="212" y="130" font-size="12">✨</text>`:''}`;
+}
+function fridgeSVG(S){
+  const open=S.door===1;
+  return `<rect x="90" y="18" width="140" height="226" rx="26" fill="${open?'#fff':'#d6f5ea'}" stroke="#9fdcc5" stroke-width="4"/>
+  ${open?`<rect x="100" y="30" width="120" height="200" rx="16" fill="#eaf8ff"/><rect x="104" y="112" width="112" height="6" rx="3" fill="#bfe3ff"/><rect x="104" y="196" width="112" height="6" rx="3" fill="#bfe3ff"/><g transform="translate(-16 -18) scale(1.1)">${miniItems({...S,bake:S.bake})}</g><text x="190" y="64" font-size="26">❄️</text>
+  <g class="tapT" data-i="0"><rect x="48" y="26" width="46" height="210" rx="18" fill="#b9f0dc" stroke="#9fdcc5" stroke-width="4" transform="skewY(4)"/><rect x="58" y="110" width="8" height="40" rx="4" fill="#fff"/></g>`
+  :`<g class="tapT" data-i="0"><g><rect x="90" y="18" width="140" height="226" rx="26" fill="#b9f0dc" stroke="#9fdcc5" stroke-width="4"/><path d="M90 100 H230" stroke="#9fdcc5" stroke-width="4"/><rect x="108" y="64" width="9" height="30" rx="4" fill="#fff"/><rect x="108" y="124" width="9" height="46" rx="4" fill="#fff"/><circle cx="196" cy="48" r="5" fill="#fff"/><circle cx="212" cy="48" r="5" fill="#fff"/><text x="160" y="190" text-anchor="middle" font-size="30">❄️</text></g></g>`}`;
+}
+function drawStage(){
+  const S=G.S,f={pot:potSVG,bowl:bowlSVG,cups:cupsSVG,oven:ovenSVG,fridge:fridgeSVG}[S.scene];
+  $('#stageSvg').innerHTML=`<svg viewBox="0 0 320 260" role="img" aria-label="ฉากทำอาหาร">${f(S)}</svg>`;
+}
+
+/* =====================================================================
+   MODULE 7 · UI HELPERS (บับเบิลคำบรรยาย / มิเตอร์ / ดาวเด้ง)
+   ===================================================================== */
+const UI={
+  sayT:null,
+  say(t){$('#say').textContent=t},
+  flash(t,ms=1700){this.say(t);clearTimeout(this.sayT);this.sayT=setTimeout(()=>this.say(G.base),ms)},
+  meter(mode,zone){
+    const m=$('#meter');m.className='meter '+(mode||'off');
+    $('#mfill').style.width='0';$('#mneedle').style.left='0';
+    if(zone){$('#mzone').style.left=zone[0]*100+'%';$('#mzone').style.width=(zone[1]-zone[0])*100+'%'}
+  },
+  pstars(n,txt){
+    const d=document.createElement('div');d.className='pstars';
+    d.innerHTML=`<div>${[1,2,3].map(i=>starSVG(i<=n)).join('')}</div><p>${txt}</p>`;
+    $('#stage').appendChild(d);setTimeout(()=>d.remove(),1300);
+  },
+  plop(e){const p=document.createElement('span');p.className='plop';p.textContent=e;$('#stage').appendChild(p);setTimeout(()=>p.remove(),750)},
+  dots(){
+    $('#dots').innerHTML=G.r.steps.map((_,i)=>`<i class="${i<G.i?'done':i===G.i?'now':''}"></i>`).join('');
+  }
+};
+
+/* =====================================================================
+   MODULE 8 · MECHANICS  (วิธีเล่นแต่ละแบบ)
+   ===================================================================== */
+const stageEl=()=>$('#stage');
+const MECH={};
+
+/* ลากส่วนผสมลงหม้อ/ชาม (แตะส่วนผสมก็ได้) */
+MECH.drag=st=>{
+  let mist=0,left=st.items.length;const S=G.S,cleanups=[];
+  const pool=shuffle([...st.items.map(x=>({...x,ok:true})),...shuffle(DECOYS).slice(0,2).map(d=>({...d,ok:false}))]);
+  const shelf=$('#shelf');shelf.innerHTML='';
+  $('#instr').textContent='ลากส่วนผสมไปวางที่หม้อ/ชาม (หรือแตะที่ส่วนผสมก็ได้นะ)';
+  const hit=ev=>{const r=stageEl().getBoundingClientRect();return ev.clientX>r.left&&ev.clientX<r.right&&ev.clientY>r.top&&ev.clientY<r.bottom};
+  const drop=(it,el)=>{
+    if(el.classList.contains('used'))return;
+    if(!it.ok){mist++;Sound.play('oops');Chars.mood('oops');el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');UI.flash('อุ๊ย! ตัวนี้ไม่ได้อยู่ในสูตรนะ ลองดูใหม่น้า 🙈');return}
+    el.classList.add('used');left--;UI.plop(it.e);Sound.play('splash');
+    S.fill=clamp(S.fill+(st.fillEach??.1),0,1);
+    if(it.c)S.liquid=S.fill<=(st.fillEach??.1)+.001&&G.firstDrop?it.c:mix(S.liquid,it.c,.45);
+    G.firstDrop=false;drawStage();
+    if(left===0)G.finish(3-Math.min(2,mist));
+  };
+  G.firstDrop=S.fill===0;
+  pool.forEach(it=>{
+    const el=document.createElement('button');el.className='ing';el.type='button';
+    el.innerHTML=`<span class="e">${it.e}</span><b>${it.n}</b><small>${it.amt||'&nbsp;'}</small>`;
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();drop(it,el)}});
+    el.addEventListener('pointerdown',e=>{
+      if(el.classList.contains('used'))return;e.preventDefault();Sound.resume();Sound.play('pop');
+      const g=el.cloneNode(true);g.classList.add('ghost');document.body.appendChild(g);
+      const sx=e.clientX,sy=e.clientY;let moved=0;
+      const mv=ev=>{g.style.left=ev.clientX+'px';g.style.top=ev.clientY+'px';moved=Math.max(moved,Math.hypot(ev.clientX-sx,ev.clientY-sy));stageEl().classList.toggle('over',hit(ev))};
+      const up=ev=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);g.remove();stageEl().classList.remove('over');if(hit(ev)||moved<8)drop(it,el)};
+      mv(e);window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+    });
+    shelf.appendChild(el);
+  });
+  return()=>{shelf.innerHTML='';stageEl().classList.remove('over');$$('.ing.ghost').forEach(g=>g.remove())};
+};
+
+/* คน / ตีไข่ — กดค้างแล้ววนเป็นวงกลม */
+MECH.stir=st=>{
+  const S=G.S,A=Settings.assist(),c=st.stir,need=c.rev*A.rev,limit=(c.limit||2.4)*A.gentle;
+  let acc=0,last=null,pressed=false,mist=0,wAcc=0,wT=performance.now(),lastW=0,warnT=0;
+  const f0=S.fill,fTo=c.fillTo??S.fill,c0=S.liquid;
+  S.spoonOn=true;S.spoon=0;
+  UI.meter('fill');$('#instr').textContent='กดค้างแล้ววนเป็นวงกลมเพื่อ'+(c.gentle?'คนเบา ๆ (อย่าเร็วเกินไป)':'ตีให้เร็ว ๆ')+' หรือแตะรัว ๆ ก็ได้';
+  stageEl().classList.add('ptr');
+  const ang=e=>{const r=stageEl().getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height*.62),e.clientX-(r.left+r.width*.5))};
+  const progress=()=>{
+    const p=clamp(acc/need,0,1);$('#mfill').style.width=p*100+'%';
+    S.fill=lerp(f0,fTo,p);if(c.to)S.liquid=mix(c0,c.to,p);drawStage();
+    if(p>=1)G.finish(3-Math.min(2,mist));
+  };
+  G.mech={
+    down(e){pressed=true;last=ang(e);G.tx=e.clientX;G.ty=e.clientY;G.moved=0;stageEl().setPointerCapture(e.pointerId)},
+    move(e){
+      if(!pressed||G.busy)return;const a=ang(e);let d=a-last;if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;
+      last=a;S.spoon=a;const rev=Math.abs(d)/(2*Math.PI);acc+=rev;wAcc+=rev;G.moved+=Math.abs(d);
+      const now=performance.now();
+      if(now-wT>160){
+        const sp=wAcc/((now-wT)/1000);wAcc=0;wT=now;
+        if(c.gentle&&sp>limit&&now-warnT>900){warnT=now;mist++;Sound.play('oops');Chars.mood('oops');UI.flash('ช้าลงหน่อยน้า ฟองเยอะแล้ว! 💧')}
+      }
+      if(now-lastW>260){lastW=now;Sound.play('whoosh')}
+      progress();
+    },
+    up(e){pressed=false;if(Math.hypot(e.clientX-G.tx,e.clientY-G.ty)<6){acc+=.25;S.spoon+=1.2;Sound.play('whoosh');progress()}}
+  };
+  return()=>{S.spoonOn=false;stageEl().classList.remove('ptr');G.mech=null};
+};
+
+/* ร่อน/กรอง — ลากซ้าย-ขวา */
+MECH.swipe=st=>{
+  const S=G.S,A=Settings.assist(),n=Math.max(2,Math.round(st.swipe.n*A.rev)),f0=S.fill;
+  let cnt=0,pressed=false,lastX=0,startX=0,dist=0,dir=0,dT=null;
+  S.sieve=true;S.sieveX=0;S.dust=false;S.dustColor=st.swipe.dust;
+  UI.meter('fill');$('#instr').textContent='กดค้างแล้วลากซ้าย-ขวาเพื่อร่อน (หรือแตะที่กระชอนก็ได้)';
+  stageEl().classList.add('ptr');
+  const bump=()=>{
+    cnt++;Sound.play('tap');S.fill=clamp(f0+(st.swipe.fillTo??.1)*cnt/n,0,1);
+    $('#mfill').style.width=cnt/n*100+'%';S.dust=true;clearTimeout(dT);dT=setTimeout(()=>{S.dust=false;drawStage()},450);
+    drawStage();if(cnt>=n)G.finish(3);
+  };
+  G.mech={
+    down(e){pressed=true;startX=lastX=e.clientX;dist=0;dir=0;G.tx=e.clientX;G.ty=e.clientY;stageEl().setPointerCapture(e.pointerId)},
+    move(e){
+      if(!pressed||G.busy)return;const dx=e.clientX-lastX;lastX=e.clientX;
+      S.sieveX=clamp((e.clientX-startX)*.5,-50,50);
+      const d=Math.sign(dx);if(d&&d!==dir){dir=d;dist=0}dist+=Math.abs(dx);
+      if(dist>55){dist=0;dir=-dir;bump()}else{S.dust=true;drawStage()}
+    },
+    up(e){pressed=false;S.sieveX=0;if(Math.hypot(e.clientX-G.tx,e.clientY-G.ty)<6)bump();else drawStage()}
+  };
+  return()=>{S.sieve=false;S.dust=false;stageEl().classList.remove('ptr');G.mech=null;clearTimeout(dT)};
+};
+
+/* แตะ — ใส่ถ้วย / ปิดฟอยล์ / หมุนปุ่ม / เปิดตู้เย็น */
+MECH.tap=st=>{
+  const S=G.S,t=st.tap;let c=0;
+  UI.meter('fill');$('#instr').textContent='แตะที่จุดที่กำลังกระพริบ';
+  const h=e=>{
+    const el=e.target.closest('.tapT');if(!el||G.busy)return;const i=+el.dataset.i;
+    if(t.flag){if(S.cups[i][t.flag])return;S.cups[i][t.flag]=1}
+    if(t.dial){S.dial++;S.temp=Math.round(25+(t.temp-25)*(c+1)/t.n)+'°C';if(c+1>=t.n)S.hot=true}
+    if(t.door){S.door=(c+1)%2}
+    c++;Sound.play(t.dial?'click':'tap');if(t.flag==='caramel'||t.flag==='batter')Sound.play('splash');
+    $('#mfill').style.width=c/t.n*100+'%';drawStage();
+    if(c>=t.n)G.finish(3);
+  };
+  stageEl().addEventListener('click',h);
+  return()=>stageEl().removeEventListener('click',h);
+};
+
+/* จับเวลา — กดปุ่มให้ตรงโซนสีเขียว */
+MECH.timing=st=>{
+  const S=G.S,A=Settings.assist(),t=st.timing,mid=(t.zone[0]+t.zone[1])/2,half=(t.zone[1]-t.zone[0])/2*A.zone;
+  const z=[mid-half,mid+half];let ph=0,raf,last=performance.now(),siz=null;
+  UI.meter('time',z);$('#instr').textContent='กดปุ่มตอนเข็มอยู่ในโซนสีเขียว!';
+  const act=$('#act');act.textContent=t.label;act.classList.remove('hidden');
+  S.heat=true;S.boil=false;
+  if(t.sizzle||t.bake){Sound.play('sizzle');siz=setInterval(()=>Sound.play('sizzle'),500)}
+  const upd=()=>{
+    if(t.liquid){S.liquid=ph<t.mid?mix(t.colors[0],t.colors[1],ph/t.mid):mix(t.colors[1],t.colors[2],(ph-t.mid)/(1-t.mid))}
+    if(t.bake)S.bake=ph;
+    if(t.warm)S.boil=ph>.72;
+    $('#mneedle').style.left=ph*100+'%';drawStage();
+  };
+  const stop=()=>{
+    cancelAnimationFrame(raf);clearInterval(siz);S.heat=false;if(t.bake)S.baked=true;
+    const d=Math.abs(ph-mid),r=half;let n=d<=r*.55?3:d<=r?2:1;
+    const txt=n===3?'สุกกำลังดีเลย! 😍':n===2?'ใช้ได้เลยน้า~ 😊':(ph<z[0]?'ยังดิบไปนิดนึง 🥺':'ไหม้นิดหน่อย แต่ยังกินได้! 🙈');
+    G.base=txt;UI.say(txt);upd();G.finish(n);
+  };
+  const loop=now=>{if(document.querySelector('.overlay.open')){last=now;raf=requestAnimationFrame(loop);return}const dt=Math.max(0,(now-last)/1000);last=now;ph=Math.min(1,ph+t.speed*A.speed*dt);upd();if(ph>=1)stop();else raf=requestAnimationFrame(loop)};
+  raf=requestAnimationFrame(loop);
+  act.onclick=()=>{if(!G.busy)stop()};
+  return()=>{cancelAnimationFrame(raf);clearInterval(siz);act.classList.add('hidden');act.onclick=null;S.heat=false};
+};
+
+/* =====================================================================
+   MODULE 9 · GAME ENGINE
+   ===================================================================== */
+const G={
+  r:null,i:0,S:{},scores:[],busy:false,cleanup:null,mech:null,base:'',timer:null,
+  init(){const s=$('#stage');
+    ['pointerdown','pointermove','pointerup','pointercancel'].forEach(ev=>s.addEventListener(ev,e=>{
+      if(!this.mech)return;(ev==='pointerdown'?this.mech.down:ev==='pointermove'?this.mech.move:this.mech.up)(e)}));
+  },
+  freshS(){return{scene:'pot',fill:0,liquid:'#f6f1e6',heat:false,boil:false,bake:0,cups:[],items:this.r.items,dial:0,hot:false,door:0,baked:false,water:false,spoon:0,spoonOn:false,sieve:false,sieveX:0,dust:false,temp:'25°C'}},
+  start(id){
+    this.abort();this.r=RECIPES[id];this.i=0;this.scores=[];this.S=this.freshS();
+    $('#g-name').textContent=this.r.name;
+    const TH={custard:['#ffe0ee','#ffc2dc'],cupcake:['#d9f6ea','#b3ead3'],cookie:['#ebe3ff','#d3c3fa']}[id];
+    $('#kitchen').style.setProperty('--th',TH[0]);$('#kitchen').style.setProperty('--th2',TH[1]);
+    const K=$('#kitchen');K.dataset.theme=id;
+    const SH={custard:['🍮','🥚','🥛','🍒','🍯'],cupcake:['🧁','🍓','🍬','☕','🌷'],cookie:['🍪','🥛','🍬','🍫','🌷']}[id];
+    $('.wshelf',K).innerHTML=SH.map(e=>`<span>${e}</span>`).join('');
+    const KS={custard:['🍮','🍒','✨','🥚','💖','🍮'],cupcake:['🧁','🍓','✨','🌸','💖','🧁'],cookie:['🍪','😈','✨','🍫','⭐','🍪']}[id];
+    $$('.ks',K).forEach((k,i)=>k.textContent=KS[i%KS.length]);
+    let sg=$('.sign',K);if(!sg){sg=document.createElement('div');sg.className='sign';K.appendChild(sg)}
+    sg.textContent={custard:'Pudding Time 🍮',cupcake:'Cupcake Party 🧁',cookie:'Naughty Cookies 😈'}[id];
+    Screens.show('game');Chars.refresh();this.load();
+  },
+  abort(){clearTimeout(this.timer);if(this.cleanup){this.cleanup();this.cleanup=null}this.mech=null},
+  load(){
+    const st=this.r.steps[this.i];this.busy=false;
+    const set={...(st.set||{})};
+    if(set.cupsN){this.S.cups=Array.from({length:set.cupsN},()=>({}));delete set.cupsN}
+    Object.assign(this.S,set);
+    this.base=st.say;UI.say(st.say);$('#tip').textContent='💡 '+st.tip;UI.dots();UI.meter('off');
+    $('#shelf').innerHTML='';$('#instr').textContent='';$('#act').classList.add('hidden');
+    document.documentElement.style.setProperty('--shelf',st.t==='drag'?'96px':'8px');
+    this.cleanup=MECH[st.t](st);drawStage();
+  },
+  finish(n){
+    if(this.busy)return;this.busy=true;const st=this.r.steps[this.i];this.scores.push(n);
+    if(this.cleanup){this.cleanup();this.cleanup=null}this.mech=null;
+    Object.assign(this.S,st.done||{});drawStage();
+    Sound.play(n===3?'star':'ding');Chars.mood(n>1?'cheer':'happy',1500);
+    UI.pstars(n,n===3?'สุดยอด!':n===2?'เก่งมาก!':'ลองใหม่นะ~');
+    $('#dots').children[this.i]?.classList.add('done');
+    this.timer=setTimeout(()=>{this.i++;this.i>=this.r.steps.length?this.end():this.load()},1500);
+  },
+  end(){
+    const avg=this.scores.length?this.scores.reduce((a,b)=>a+b,0)/this.scores.length:1,fin=clamp(Math.round(avg)||1,1,3);
+    const id=this.r.id;Progress.best[id]=Math.max(Progress.best[id]||0,fin);Progress.save();
+    $('#res-ico').innerHTML=iconSVG(id);
+    $('#res-title').textContent=this.r.name+' เสร็จแล้ว!';
+    $('#res-stars').innerHTML=[1,2,3].map(i=>starSVG(i<=fin)).join('');
+    $('#res-msg').textContent=fin===3?'สุดยอดเชฟประจำร้าน N&J! อร่อยที่สุดในโลกเลย 🎉':fin===2?'อร่อยมาก ๆ เลย! อีกนิดเดียวก็เต็มสามดาวแล้วนะ 💖':'ใช้ได้เลย! ลองทำอีกครั้ง รับรองเก่งขึ้นแน่ ๆ 🌈';
+    Screens.show('result');Sound.play('win');confetti();
+  }
+};
+
+/* =====================================================================
+   MODULE 10 · SCREENS / MENU / MODALS
+   ===================================================================== */
+const Screens={
+  show(n){$$('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+n));if(n==='menu')buildMenu();$$('.conf').forEach(c=>c.remove())}
+};
+function buildMenu(){
+  let mp=$('#menu-pal');
+  if(!mp){mp=document.createElement('div');mp.id='menu-pal';$('#screen-menu').appendChild(mp)}
+  const msgs=['วันนี้ทำอะไรดีน้า~ 🍰','เลือกเมนูที่ชอบเลย! 💖','ดาวเยอะ = ยากขึ้นน้า ⭐','ลองลากดาวเล่นดูสิ~ ✨'];
+  mp.innerHTML=`<div class="say">${msgs[Math.random()*msgs.length|0]}</div>${charSVG(Settings.d.char,'cheer')}`;
+  $('#cards').innerHTML=Object.values(RECIPES).map((r,i)=>{
+    const b=Progress.best[r.id]||0;
+    return `<article class="card" style="--c:${r.color}"><span class="badge">${i+1}</span><div class="peek">${charSVG(['bunny','cat','bear'][i])}</div>
+      <div class="ico">${iconSVG(r.id)}<span class="sticker">${['เหมาะกับมือใหม่ 🌱','หวานฟูนุ่ม 💕','ท้าทายสุด ๆ 🔥'][i]}</span></div>
+      <h3>${r.name}</h3><p class="sub">${r.sub}</p><span class="chip">${['ง่ายมาก','ปานกลาง','ท้าทาย'][r.stars-1]}</span><p class="meta">🥣 ${r.steps.length} ขั้นตอน · พาสเทลน่ารัก 💕</p>
+      <div class="diff" aria-label="ความยาก ${r.stars} ดาว">ความยาก ${[1,2,3].map(i=>starSVG(i<=r.stars)).join('')}</div>
+      <div class="best">${b?'ทำได้ดีที่สุด '+[1,2,3].map(i=>starSVG(i<=b)).join(''):'ยังไม่เคยทำ'}</div>
+      <button class="btn pri" data-play="${r.id}">▶ เริ่มทำเลย!</button></article>`}).join('');
+  $$('.diff .star').forEach(s=>{
+    makeDraggable(s,{snap:true});
+    s.addEventListener('click',()=>{s.classList.remove('spin');void s.getBoundingClientRect();s.classList.add('spin');Sound.play('ding')});
+  });
+  $$('.card').forEach(c=>{
+    c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*14+'deg');c.style.setProperty('--rx',-((e.clientY-r.top)/r.height-.5)*14+'deg')});
+    c.addEventListener('pointerleave',()=>{c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')});
+    c.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')Sound.play('pop')});
+    c.addEventListener('click',e=>{if(e.target.closest('.star,[data-play]'))return;Sound.play('click');G.start(c.querySelector('[data-play]').dataset.play)});
+  });
+  $$('[data-play]').forEach(b=>b.onclick=()=>{Sound.play('click');G.start(b.dataset.play)});
+}
+function confetti(){
+  const cols=['#ff86b3','#ffcf5c','#5fd3ac','#a98cff','#8fd7ff'],sc=$('#screen-result');
+  for(let i=0;i<46;i++){const c=document.createElement('i');c.className='conf';c.style.left=Math.random()*100+'%';c.style.background=cols[i%5];c.style.animationDuration=2.4+Math.random()*2.4+'s';c.style.animationDelay=Math.random()*1.2+'s';sc.appendChild(c)}
+}
+function openModal(id){$('#'+id).classList.add('open');Sound.play('pop')}
+function closeModals(){$$('.overlay').forEach(o=>o.classList.remove('open'))}
+function buildSettings(){
+  const d=Settings.d;
+  $('#s-reset').textContent='ล้าง';$('#s-music').value=d.music;$('#s-sfx').value=d.sfx;$('#s-mute').checked=d.mute;$('#s-cap').checked=d.captions;$('#s-hint').checked=d.hints;$('#s-calm').checked=d.calm;
+  $$('#s-assist button').forEach(b=>b.classList.toggle('on',b.dataset.v===d.assist));
+  $('#s-char').innerHTML=Object.keys(CHARS).map(k=>`<button data-k="${k}" class="${k===d.char?'on':''}" aria-label="${CHARS[k].n}">${charSVG(k)}</button>`).join('');
+  $$('#s-char button').forEach(b=>b.onclick=()=>{Settings.set('char',b.dataset.k);Sound.play('ding');buildSettings()});
+}
+function buildBook(){
+  const r=G.r;$('#book-title').childNodes[0].textContent='📖 '+r.name+' ';
+  $('#book-body').innerHTML=r.book.map(s=>`<h3>${s.h}</h3><ul>${s.l.map(x=>`<li>${x}</li>`).join('')}</ul>`).join('');
+}
+
+/* =====================================================================
+   MODULE 11 · BOOT
+   ===================================================================== */
+function boot(){
+  Settings.load();Progress.load();G.init();
+  /* start screen decor */
+  const sp=$('#sparkles'),cols=['#fff','#ffe08a','#ffc2dc','#c9b8ff'];
+  for(let i=0;i<22;i++){const e=document.createElement('i');e.className='spark';e.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*60}%;background:${cols[i%4]};animation-delay:${Math.random()*2.6}s;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px`;sp.appendChild(e)}
+  ['bunny','cat','bear'].forEach(k=>{const el=$('#pal-'+k);el.innerHTML=charSVG(k,'cheer');makeDraggable(el)});
+  ['custard','cupcake','cookie'].forEach((id,i)=>{const el=$('#fl-'+(i+1));el.innerHTML=iconSVG(id);makeDraggable(el)});
+  $('#flags').innerHTML=Array.from({length:12},(_,i)=>`<i style="--fc:${['#ffb3d1','#fff0b3','#b9f0dc','#d8c9ff','#bfe3ff'][i%5]}"></i>`).join('');
+  makeDraggable($('#char'),{onGrab:()=>Chars.mood('cheer',900)});
+  /* ขยับดุ๊กดิ๊ก: เพื่อนกระโดดเมื่อแตะ / กระโดดเองสุ่ม / พื้นหลังขยับตามนิ้ว / แตะแล้วมีประกาย */
+  /* อาหารหลากหลายไหลลงมาจากด้านบน */
+  /* ธงราวหัวจอ + ดอกไม้กระพริบบนเนิน */
+  const scr=$('#screen-start'),fcs=['#ffb3d1','#fff0b3','#b9f0dc','#d8c9ff','#bfe3ff'];
+  const bun=document.createElement('div');bun.className='bunting';
+  bun.innerHTML=Array.from({length:14},(_,i)=>`<i style="--fc:${fcs[i%5]};animation-delay:${i*.15}s"></i>`).join('');scr.prepend(bun);
+  const fw=document.createElement('div');fw.className='flowers';
+  fw.innerHTML=Array.from({length:16},(_,i)=>`<span style="animation-delay:${i*.2}s;font-size:${22+(i*7%14)}px">${['🌸','🌷','🌼','🌻','🍄','🌱'][i%6]}</span>`).join('');scr.appendChild(fw);
+  const stt=$('#screen-start'),pals=$$('.pal');
+  const rain=$('#foodrain'),foods=['🍰','🧁','🍪','🍩','🍓','🍮','🍡','🍙','🍜','🍕','🍔','🍟','🥞','🍦','🍭','🍒','🥐','🍣','🍤','🍉','🍫','🍝','🥩','🍱','🧇','🍯'];
+  const dropFood=pre=>{
+    if(!stt.classList.contains('active')||document.body.classList.contains('calm')||document.hidden||rain.children.length>30)return;
+    const f=document.createElement('span'),dur=6+Math.random()*5;f.className='fall';f.textContent=foods[Math.random()*foods.length|0];
+    f.style.cssText=`left:${Math.random()*94}%;font-size:${28+Math.random()*34}px;animation-duration:${dur}s;--sw:${Math.random()*80-40}px;--rot:${Math.random()*400-200}deg;${pre?`animation-delay:-${Math.random()*dur*.9}s`:''}`;
+    rain.appendChild(f);setTimeout(()=>f.remove(),dur*1000+300);
+  };
+  const bl=['#ffb3d1','#bfe3ff','#fff0b3','#b9f0dc','#d8c9ff','#ffd2b3'];
+  bl.forEach((c,i)=>{const b=document.createElement('div');b.className='balloon';b.style.cssText=`left:${5+i*16}%;--bc:${c};animation-duration:${15+i*2}s;animation-delay:-${i*3.5}s`;scr.appendChild(b)});
+  for(let i=0;i<8;i++){
+    const b=document.createElement('div'),sz=34+Math.random()*34;b.className='bub2';
+    b.style.cssText=`left:${4+i*12+Math.random()*6}%;width:${sz}px;height:${sz}px;animation-duration:${12+Math.random()*8}s;animation-delay:-${Math.random()*14}s`;
+    b.addEventListener('pointerdown',()=>{
+      const r=b.getBoundingClientRect(),pr=scr.getBoundingClientRect();
+      b.style.top=r.top-pr.top+'px';b.style.bottom='auto';b.classList.add('gone');Sound.resume();Sound.play('pop');
+      ['✨','💖','💧'].forEach((em,k)=>{const p=document.createElement('span');p.className='puff';p.textContent=em;p.style.left=r.left-pr.left+sz/3+'px';p.style.top=r.top-pr.top+sz/3+'px';p.style.setProperty('--dx',(k*30-30)+'px');scr.appendChild(p);setTimeout(()=>p.remove(),1000)});
+      setTimeout(()=>{b.style.top='';b.style.bottom='';b.classList.remove('gone')},2600);
+    });
+    scr.appendChild(b);
+  }
+  for(let i=0;i<14;i++)dropFood(true);
+  const cp=document.createElement('div');cp.id='catch';cp.setAttribute('aria-live','polite');scr.appendChild(cp);
+  let caught=0;try{caught=+localStorage.getItem('nj_catch')||0}catch(e){}
+  const showC=()=>{cp.innerHTML=`🍬 จับขนมได้ <b>${caught}</b>`};showC();
+  rain.addEventListener('pointerdown',e=>{
+    const f=e.target.closest('.fall');if(!f||f.classList.contains('popped'))return;
+    const r=f.getBoundingClientRect(),pr=scr.getBoundingClientRect(),rr=rain.getBoundingClientRect();
+    f.style.left=r.left-rr.left+'px';f.style.top=r.top-rr.top+'px';f.classList.add('popped');setTimeout(()=>f.remove(),420);
+    caught++;try{localStorage.setItem('nj_catch',caught)}catch(e){}
+    showC();cp.classList.remove('bump');void cp.offsetWidth;cp.classList.add('bump');Sound.resume();Sound.play('tap');
+    ['✨','💖','⭐','🌸'].forEach((em,i)=>{const p=document.createElement('span');p.className='puff';p.textContent=em;p.style.left=r.left-pr.left+'px';p.style.top=r.top-pr.top+'px';p.style.setProperty('--dx',(i*30-45)+'px');scr.appendChild(p);setTimeout(()=>p.remove(),1000)});
+    if(caught%10===0){
+      Sound.play('star');pals.forEach(hop);say(pals[Math.random()*3|0]);
+      for(let i=0;i<14;i++){const p=document.createElement('span');p.className='puff';p.textContent=['🎉','🍬','⭐','🧁'][i%4];p.style.left=Math.random()*90+'%';p.style.top=30+Math.random()*50+'%';p.style.setProperty('--dx',(Math.random()*100-50)+'px');p.style.animationDelay=i*.04+'s';scr.appendChild(p);setTimeout(()=>p.remove(),1400)}
+    }
+  });
+  setInterval(dropFood,420);
+  const mrain=document.createElement('div');mrain.id='menurain';$('#screen-menu').prepend(mrain);
+  setInterval(()=>{
+    const m=$('#screen-menu');if(!m.classList.contains('active')||document.body.classList.contains('calm')||document.hidden||mrain.children.length>14)return;
+    const f=document.createElement('span'),dur=8+Math.random()*5;f.className='fall';f.textContent=foods[Math.random()*foods.length|0];
+    f.style.cssText=`left:${Math.random()*94}%;font-size:${24+Math.random()*26}px;animation-duration:${dur}s;--sw:${Math.random()*80-40}px;--rot:${Math.random()*400-200}deg`;
+    mrain.appendChild(f);setTimeout(()=>f.remove(),dur*1000+300);
+  },800);
+  let tl=0;
+  $('#screen-menu').addEventListener('pointermove',e=>{
+    const n=performance.now();if(n-tl<110||document.body.classList.contains('calm'))return;tl=n;
+    const m=$('#screen-menu'),r=m.getBoundingClientRect(),p=document.createElement('span');
+    p.className='puff';p.style.fontSize='1.1rem';p.textContent=['✨','💖','⭐','🌸'][Math.random()*4|0];
+    p.style.left=e.clientX-r.left-8+'px';p.style.top=e.clientY-r.top-8+'px';p.style.setProperty('--dx',(Math.random()*40-20)+'px');
+    m.appendChild(p);setTimeout(()=>p.remove(),1000);
+  });
+  const hop=el=>{el.classList.remove('jump');void el.offsetWidth;el.classList.add('jump');setTimeout(()=>el.classList.remove('jump'),700)};
+  const LINES={bunny:['จั๊กจี้นะ~ 🐰','ไปทำขนมกัน! 🍰','น่ากินจังเลย~ 💕'],cat:['เมี๊ยว~ 🐱','ขอคุกกี้หน่อยสิ! 🍪','หิวแล้วน้า~ 🤤'],bear:['หม่ำ ๆ ๆ 🐻','ฉันชอบพุดดิ้ง! 🍮','กอดหน่อยนะ~ 💕']};
+  const say=el=>{const L=LINES[el.id.slice(4)];const o=el.querySelector('.speech');if(o)o.remove();const s=document.createElement('div');s.className='speech';s.textContent=L[Math.random()*L.length|0];el.appendChild(s);setTimeout(()=>s.remove(),1950)};
+  pals.forEach(el=>el.addEventListener('pointerdown',()=>{hop(el);say(el);Sound.play('tap')}));
+  setInterval(()=>{if(stt.classList.contains('active')&&!document.body.classList.contains('calm')){const p=pals[Math.random()*3|0];hop(p);if(Math.random()<.5)say(p)}},2400);
+  stt.addEventListener('pointermove',e=>{
+    const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;
+    $('#logo').style.translate=`${x*-26}px ${y*-14}px`;
+    stt.querySelector('.ribbon').style.translate=`${x*-14}px ${y*-8}px`;
+    $('#sparkles').style.translate=`${x*30}px ${y*20}px`;
+  });
+  stt.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button'))return;
+    const r=stt.getBoundingClientRect(),em=['✨','💖','⭐','🌸','🍬'];
+    for(let i=0;i<5;i++){const p=document.createElement('span');p.className='puff';p.textContent=em[Math.random()*5|0];
+      p.style.left=e.clientX-r.left-12+'px';p.style.top=e.clientY-r.top-12+'px';p.style.setProperty('--dx',(Math.random()*120-60)+'px');p.style.animationDelay=i*.05+'s';
+      stt.appendChild(p);setTimeout(()=>p.remove(),1200)}
+  });
+  $$('#logo span').forEach(s=>s.addEventListener('click',()=>{s.classList.remove('pop');void s.offsetWidth;s.classList.add('pop');Sound.play('ding')}));
+  /* first gesture → audio + music */
+  const first=()=>{Sound.resume();Sound.startMusic();document.removeEventListener('pointerdown',first)};
+  document.addEventListener('pointerdown',first);
+  /* nav */
+  $('#btn-play').onclick=()=>{Sound.play('ding');Screens.show('menu')};
+  $('#btn-set-start').onclick=()=>{buildSettings();openModal('settings')};
+  $('#menu-back').onclick=()=>{Sound.play('click');Screens.show('start')};
+  $('#game-back').onclick=()=>{G.abort();Sound.play('click');Screens.show('menu')};
+  $('#res-again').onclick=()=>G.start(G.r.id);
+  $('#res-menu').onclick=()=>Screens.show('menu');
+  $('#btn-book').onclick=()=>{buildBook();openModal('book')};
+  $$('[data-open="settings"]').forEach(b=>b.onclick=()=>{buildSettings();openModal('settings')});
+  $$('[data-close]').forEach(b=>b.onclick=closeModals);
+  $$('.overlay').forEach(o=>o.addEventListener('pointerdown',e=>{if(e.target===o)closeModals()}));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals()});
+  /* settings controls */
+  $('#s-music').oninput=e=>Settings.set('music',+e.target.value);
+  $('#s-sfx').oninput=e=>Settings.set('sfx',+e.target.value);
+  $('#s-sfx').onchange=()=>Sound.play('ding');
+  $('#s-mute').onchange=e=>Settings.set('mute',e.target.checked);
+  $('#s-cap').onchange=e=>Settings.set('captions',e.target.checked);
+  $('#s-hint').onchange=e=>Settings.set('hints',e.target.checked);
+  $('#s-calm').onchange=e=>Settings.set('calm',e.target.checked);
+  $$('#s-assist button').forEach(b=>b.onclick=()=>{Settings.set('assist',b.dataset.v);buildSettings();Sound.play('click')});
+  $('#s-reset').onclick=()=>{Progress.best={};Progress.save();Sound.play('pop');$('#s-reset').textContent='ล้างแล้ว ✓'};
+  Settings.apply();
+}
+boot();
+</script>
+</body>
+</html>
